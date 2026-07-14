@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — פעילות</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.55); --glass-2:rgba(255,255,255,.75); --glass-brd:rgba(255,255,255,.7);
+    --pad:20px; --gap:14px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.08);
+    --body-bg:radial-gradient(120% 60% at 50% 0%, #E9F0E4 0%, transparent 55%), var(--bg-outer);
+    --header-bg:linear-gradient(160deg, var(--green) 0%, #24471F 100%); --notch:var(--green);
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.075); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5);
+    --body-bg:#050506; --header-bg:#111318; --notch:#0A0B0D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--body-bg);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--notch); position:relative; z-index:30}
+  .notch::after{content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:120px; height:18px; background:var(--notch); border-radius:0 0 14px 14px}
+
+  .top{display:flex; align-items:center; gap:12px; padding:14px var(--pad); background:var(--header-bg); color:#F3F0E9}
+  .brand{display:flex; align-items:center; gap:9px}
+  .brand img{width:30px; height:30px}
+  .brand span{font-size:19px; font-weight:600; letter-spacing:.5px}
+  .topbtns{margin-inline-start:auto; display:flex; gap:9px}
+  .iconbtn{width:38px; height:38px; border-radius:12px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); color:#F3F0E9; display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; position:relative}
+  .iconbtn svg{width:19px; height:19px}
+  .iconbtn .badge{position:absolute; top:-4px; left:-4px; min-width:17px; height:17px; border-radius:9px; background:var(--mustard); color:#3a2a00; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 4px}
+
+  .body{flex:1; overflow-y:auto; padding:16px var(--pad) 96px}
+  .body::-webkit-scrollbar{display:none}
+
+  .challenge{display:flex; align-items:center; gap:13px; background:var(--glass); border:1px solid var(--glass-brd); border-radius:var(--radius); padding:14px 16px; margin-bottom:16px; backdrop-filter:blur(12px); box-shadow:var(--shadow)}
+  .challenge .em{width:42px; height:42px; border-radius:12px; background:rgba(230,168,0,.15); color:var(--mustard-2); display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .challenge .em svg{width:22px; height:22px}
+  .challenge .ct{flex:1}
+  .challenge .ct b{font-size:15px; font-weight:600; display:block}
+  .challenge .ct small{font-size:12.5px; color:var(--muted)}
+  .challenge .go{background:var(--green); color:#F3F0E9; font-weight:600; font-size:13px; padding:9px 14px; border-radius:12px; border:none; cursor:pointer; font-family:inherit; white-space:nowrap}
+
+  .seg{display:flex; background:var(--glass); border:1px solid var(--line); border-radius:13px; padding:4px; margin-bottom:16px; backdrop-filter:blur(8px)}
+  .seg div{flex:1; text-align:center; padding:9px; border-radius:10px; font-size:14px; font-weight:500; color:var(--muted); cursor:pointer}
+  .seg div.on{background:var(--green); color:#F3F0E9}
+
+  .act{background:var(--glass); border:1px solid var(--glass-brd); border-radius:var(--radius); padding:16px; margin-bottom:13px; backdrop-filter:blur(12px); box-shadow:var(--shadow)}
+  .au{display:flex; align-items:center; gap:12px}
+  .av{width:44px; height:44px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:#F3F0E9; font-weight:600; font-size:17px}
+  .au-main{flex:1; min-width:0}
+  .au-name{font-size:15px; font-weight:600}
+  .au-time{font-size:12px; color:var(--muted); margin-top:1px}
+  .kind{width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .kind svg{width:18px; height:18px}
+  .k-trick{background:rgba(45,90,39,.12); color:var(--green)} .k-streak{background:rgba(230,168,0,.15); color:var(--mustard-2)}
+  .k-level{background:rgba(230,168,0,.15); color:var(--mustard-2)} .k-circle{background:rgba(45,90,39,.12); color:var(--green)} .k-post{background:var(--glass-2); color:var(--muted)}
+  .abody{font-size:14.5px; line-height:1.55; margin:13px 2px 0}
+  .abody b{font-weight:600}
+  .chips{display:flex; gap:8px; margin-top:11px; flex-wrap:wrap}
+  .chip{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:4px 11px; border-radius:11px}
+  .chip svg{width:13px; height:13px}
+  .chip.xp{background:rgba(45,90,39,.12); color:var(--green)}
+  .chip.lv{background:rgba(230,168,0,.14); color:var(--mustard-2)}
+  .chip.pl{background:rgba(45,90,39,.1); color:var(--green-2)}
+  .afoot{display:flex; align-items:center; gap:20px; margin-top:14px; padding-top:13px; border-top:1px solid var(--line)}
+  .afoot button{background:none; border:none; color:var(--muted); font-size:13.5px; font-weight:500; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px}
+  .afoot button svg{width:18px; height:18px}
+  .afoot button.kud.on{color:var(--green)}
+  .afoot .who{margin-inline-start:auto; font-size:12px; color:var(--muted)}
+
+  .nav{position:absolute; bottom:0; left:0; right:0; height:70px; background:var(--bg); border-top:1px solid var(--line);
+    display:flex; justify-content:space-around; align-items:center; padding-bottom:6px; z-index:20}
+  .nav a{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--muted); text-decoration:none; font-weight:500; cursor:pointer; background:none; border:none; font-family:inherit}
+  .nav a svg{width:23px; height:23px}
+  .nav a.on{color:var(--green)}
+  .nav a.fab{width:54px; height:54px; border-radius:50%; background:#2D5A27; color:#fff; display:flex; align-items:center; justify-content:center; margin-top:-22px; box-shadow:0 6px 18px rgba(0,0,0,.28); text-decoration:none; border:none; cursor:pointer}
+  .nav a.fab svg{width:27px; height:27px; color:#fff; stroke-width:2.75}
+
+  .overlay{position:absolute; inset:0; background:rgba(44,62,80,.4); opacity:0; pointer-events:none; transition:.25s; z-index:35; backdrop-filter:blur(2px)}
+  .overlay.show{opacity:1; pointer-events:auto}
+  .sheet{position:absolute; left:0; right:0; bottom:0; background:var(--bg); border-radius:26px 26px 0 0; transform:translateY(102%); transition:.3s cubic-bezier(.3,.8,.3,1); z-index:36; box-shadow:0 -10px 40px rgba(44,62,80,.18)}
+  .sheet.show{transform:translateY(0)}
+  .grab{width:44px; height:5px; background:var(--line); border-radius:3px; margin:12px auto 6px}
+  .sbody{padding:10px var(--pad) 24px}
+  .sh{text-align:center; font-size:18px; font-weight:600; margin-bottom:8px}
+  .ktabs{display:flex; gap:9px; margin:14px 0}
+  .ktabs div{flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:11px; border-radius:12px; border:1px solid var(--line); background:var(--glass); font-size:13px; font-weight:500; color:var(--muted); cursor:pointer}
+  .ktabs div svg{width:16px; height:16px}
+  .ktabs div.on{border-color:var(--green); background:rgba(45,90,39,.1); color:var(--green)}
+  textarea{width:100%; border:1px solid var(--line); border-radius:14px; padding:13px; font-size:14px; font-family:inherit; background:var(--glass-2); color:var(--ink); outline:none; resize:none; height:84px}
+  .post{width:100%; margin-top:18px; background:var(--green); color:#F3F0E9; border:none; border-radius:15px; padding:15px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit}
+
+  .toast{position:absolute; bottom:86px; left:50%; transform:translateX(-50%) translateY(10px); z-index:50; background:#2C3E50; color:#F3F0E9; padding:12px 20px; border-radius:14px; font-size:14px; font-weight:500; opacity:0; transition:.3s}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="top">
+    <div class="brand"><img src="logo.png" alt=""><span>GINGA</span></div>
+    <div class="topbtns">
+      <button class="iconbtn" id="themeBtn" onclick="toggleTheme()" aria-label="החלף מצב תצוגה"><i data-lucide="moon" id="themeIc"></i></button>
+      <a class="iconbtn" href="altinha-notifications.html" aria-label="התראות"><i data-lucide="bell"></i><span class="badge">3</span></a>
+      <a class="iconbtn" href="altinha-chat.html" aria-label="צ'אט"><i data-lucide="message-circle"></i><span class="badge">3</span></a>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="challenge">
+      <div class="em"><i data-lucide="trophy"></i></div>
+      <div class="ct"><b>אתגר השבוע: סקורפיון</b><small>142 שחקנים כבר השלימו</small></div>
+      <button class="go" onclick="location.href='altinha-challenges.html'">קח חלק</button>
+    </div>
+
+    <div class="seg" id="seg">
+      <div class="on" data-f="all" onclick="setF('all',this)">כל הקהילה</div>
+      <div data-f="follow" onclick="setF('follow',this)">עוקבים</div>
+    </div>
+
+    <div id="feed"></div>
+  </div>
+
+  <div class="nav">
+    <a href="altinha-training.html"><i data-lucide="book-open"></i>תרגול</a>
+    <a class="on"><i data-lucide="activity"></i>פעילות</a>
+    <a class="fab" onclick="openCompose()"><i data-lucide="plus"></i></a>
+    <a href="altinha-map.html"><i data-lucide="map-pin"></i>מפה</a>
+    <a href="altinha-profile.html"><i data-lucide="user"></i>פרופיל</a>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeCompose()"></div>
+  <div class="sheet" id="sheet">
+    <div class="grab"></div>
+    <div class="sbody">
+      <div class="sh">שיתוף לפיד</div>
+      <div class="ktabs" id="ktabs">
+        <div class="on" data-k="post"><i data-lucide="message-square"></i> עדכון</div>
+        <div data-k="trick"><i data-lucide="target"></i> הישג</div>
+        <div data-k="circle"><i data-lucide="map-pin"></i> משחק</div>
+      </div>
+      <textarea id="ptext" placeholder="מה קרה היום על החוף?"></textarea>
+      <button class="post" onclick="publishPost()">שתף</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+let FEED=[
+  {kind:"trick", follow:true, user:"דניאל", color:"#C98F00", time:"לפני 12 דק'", text:'השלים את הטריק <b>אלסטיקו</b>', chips:[['xp','+170 XP'],['lv','קשה']], kudos:34, on:false, com:8, who:"מאיה ועוד 33"},
+  {kind:"streak", follow:false, user:"שיר", color:"#3B7233", time:"לפני 40 דק'", text:'שמרה על <b>רצף של 12 ימים</b> — מכונה', chips:[], kudos:21, on:false, com:3, who:"רון ועוד 20"},
+  {kind:"circle", follow:true, user:"רון", color:"#2D5A27", time:"לפני שעה", text:'שיחק מעגל ב<b>חוף גורדון</b> עם 5 שחקנים', chips:[['pl','חוף גורדון']], kudos:15, on:false, com:2, who:"דניאל ועוד 14"},
+  {kind:"level", follow:false, user:"נועה", color:"#2D5A27", time:"לפני שעתיים", text:'עלתה ל<b>רמה 4</b> — הדרך לפריסטייל', chips:[['xp','500 XP']], kudos:28, on:true, com:6, who:"את ועוד 27"},
+  {kind:"trick", follow:false, user:"מאיה", color:"#C98F00", time:"לפני 3 שעות", text:'השלימה <b>סקורפיון</b> — אתגר השבוע בוצע', chips:[['xp','+130 XP'],['lv','בינוני']], kudos:47, on:false, com:11, who:"שיר ועוד 46"},
+  {kind:"post", follow:true, user:"צ'יקו", color:"#3B7233", time:"אתמול", text:'מי בא לשחק מחר בבוקר בהילטון? מזג אוויר מושלם', chips:[], kudos:9, on:false, com:5, who:"5 מגיבים"},
+];
+const kindIcon={trick:'target',streak:'flame',level:'zap',circle:'map-pin',post:'message-square'};
+let filter='all';
+
+function render(){
+  const w=$("#feed"); w.innerHTML="";
+  FEED.filter(a=> filter==='all'?true:a.follow).forEach((a)=>{
+    const i=FEED.indexOf(a);
+    const el=document.createElement('div'); el.className='act';
+    el.innerHTML=`
+      <div class="au">
+        <div class="av" style="background:${a.color}">${a.user[0]}</div>
+        <div class="au-main"><div class="au-name">${a.user}</div><div class="au-time">${a.time}</div></div>
+        <div class="kind k-${a.kind}"><i data-lucide="${kindIcon[a.kind]}"></i></div>
+      </div>
+      <div class="abody">${a.text}</div>
+      ${a.chips.length?`<div class="chips">${a.chips.map(c=>`<span class="chip ${c[0]}">${c[1]}</span>`).join('')}</div>`:''}
+      <div class="afoot">
+        <button class="kud ${a.on?'on':''}" onclick="kudos(${i},this)"><i data-lucide="thumbs-up"></i> <span class="kn">${a.kudos}</span></button>
+        <button onclick="toast('פותח תגובות')"><i data-lucide="message-circle"></i> ${a.com}</button>
+        <span class="who">${a.who}</span>
+      </div>`;
+    w.appendChild(el);
+  });
+  icons();
+}
+render();
+
+function setF(f,el){ filter=f; document.querySelectorAll('#seg div').forEach(x=>x.classList.remove('on')); el.classList.add('on'); render(); }
+function kudos(i,btn){ const a=FEED[i]; a.on=!a.on; a.kudos+=a.on?1:-1; btn.classList.toggle('on',a.on); btn.querySelector('.kn').textContent=a.kudos;
+  if(a.on) btn.animate([{transform:'scale(1)'},{transform:'scale(1.3)'},{transform:'scale(1)'}],{duration:280}); }
+
+let pk='post';
+function openCompose(){ $("#overlay").classList.add('show'); $("#sheet").classList.add('show'); }
+function closeCompose(){ $("#overlay").classList.remove('show'); $("#sheet").classList.remove('show'); }
+$("#ktabs").addEventListener('click',e=>{ const d=e.target.closest('div[data-k]'); if(!d)return; document.querySelectorAll('#ktabs div').forEach(x=>x.classList.remove('on')); d.classList.add('on'); pk=d.dataset.k;
+  $("#ptext").placeholder = pk==='trick'?'איזה טריק השלמת?': pk==='circle'?'איפה שיחקת ועם מי?':'מה קרה היום על החוף?'; });
+function publishPost(){
+  const t=$("#ptext").value.trim()||'שיתוף חדש';
+  FEED.unshift({kind:pk, follow:true, user:"נועה", color:"#2D5A27", time:"עכשיו", text:t, chips: pk==='trick'?[['xp','+XP']]:[], kudos:0, on:false, com:0, who:"היה הראשון להריע"});
+  $("#ptext").value=""; closeCompose(); filter='all'; document.querySelectorAll('#seg div').forEach((x,ix)=>x.classList.toggle('on',ix===0)); render(); toast('שותף לפיד');
+}
+function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); try{localStorage.setItem('ginga-theme',t)}catch(e){}
+  const ic=document.getElementById('themeIc'); if(ic){ ic.setAttribute('data-lucide', t==='dark'?'sun':'moon'); } icons(); }
+function toggleTheme(){ const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'brazil'; applyTheme(cur==='dark'?'brazil':'dark'); }
+(function(){ let t='brazil'; try{ t=localStorage.getItem('ginga-theme')||'brazil'; }catch(e){} applyTheme(t); })();
+let tT; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),1800); }
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

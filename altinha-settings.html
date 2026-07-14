@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — הגדרות</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00; --coral:#C0603D;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.6); --glass-2:rgba(255,255,255,.8); --glass-brd:rgba(255,255,255,.7);
+    --pad:18px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.08);
+    --header-bg:linear-gradient(160deg, var(--green) 0%, #24471F 100%); --notch:var(--green);
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E; --coral:#E08157;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.05); --glass-2:rgba(255,255,255,.08); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5); --header-bg:#111318; --notch:#0A0B0D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg-outer);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--notch); position:relative; z-index:30}
+  .notch::after{content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:120px; height:18px; background:var(--notch); border-radius:0 0 14px 14px}
+
+  .hdr{display:flex; align-items:center; gap:11px; padding:14px var(--pad); background:var(--header-bg); color:#F3F0E9}
+  .hdr .back{cursor:pointer; color:#F3F0E9} .hdr .back svg{width:24px;height:24px}
+  .hdr .ttl{font-size:18px; font-weight:600}
+
+  .body{flex:1; overflow-y:auto; padding:14px var(--pad) 26px}
+  .body::-webkit-scrollbar{display:none}
+  .sec{font-size:12px; font-weight:600; color:var(--muted); margin:20px 4px 8px; letter-spacing:.3px}
+  .group{background:var(--glass); border:1px solid var(--glass-brd); border-radius:16px; overflow:hidden; backdrop-filter:blur(10px); box-shadow:var(--shadow)}
+  .row{display:flex; align-items:center; gap:12px; padding:14px 14px; cursor:pointer}
+  .row + .row{border-top:1px solid var(--line)}
+  .ricon{width:34px; height:34px; border-radius:10px; background:rgba(45,90,39,.1); color:var(--green); display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .ricon svg{width:18px;height:18px}
+  .rlabel{flex:1; font-size:14.5px; font-weight:500}
+  .rlabel small{display:block; font-size:12px; color:var(--muted); font-weight:400; margin-top:1px}
+  .rval{font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px}
+  .rval svg{width:17px;height:17px}
+  .danger .rlabel{color:var(--coral)} .danger .ricon{background:rgba(192,96,61,.12); color:var(--coral)}
+
+  .sw{width:46px; height:27px; border-radius:20px; background:var(--line); position:relative; cursor:pointer; transition:.2s; flex:0 0 auto}
+  .sw::after{content:""; position:absolute; top:3px; right:3px; width:21px; height:21px; border-radius:50%; background:#fff; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .sw.on{background:var(--green)}
+  .sw.on::after{right:auto; left:3px}
+
+  .segwrap{padding:12px 14px}
+  .seg{display:flex; background:var(--glass-2); border:1px solid var(--line); border-radius:12px; padding:4px}
+  .seg div{flex:1; text-align:center; padding:9px; border-radius:9px; font-size:13px; font-weight:500; color:var(--muted); cursor:pointer}
+  .seg div.on{background:var(--green); color:#F3F0E9}
+
+  .conn{font-size:12px; font-weight:600; padding:5px 12px; border-radius:20px}
+  .conn.linked{background:rgba(45,90,39,.12); color:var(--green)}
+  .conn.link{background:var(--green); color:#F3F0E9; border:none; cursor:pointer; font-family:inherit}
+
+  .ver{text-align:center; font-size:12px; color:var(--muted); margin-top:22px}
+  .toast{position:absolute; bottom:30px; left:50%; transform:translateX(-50%) translateY(10px); z-index:50; background:#2C3E50; color:#F3F0E9; padding:12px 18px; border-radius:14px; font-size:13.5px; font-weight:500; opacity:0; transition:.3s}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="hdr">
+    <a class="back" href="altinha-profile.html"><i data-lucide="chevron-right"></i></a>
+    <div class="ttl">הגדרות</div>
+  </div>
+
+  <div class="body">
+    <div class="sec">חשבון</div>
+    <div class="group">
+      <div class="row" onclick="toast('עריכת שם')"><div class="ricon"><i data-lucide="user"></i></div><div class="rlabel">שם</div><div class="rval">נועה לוי <i data-lucide="chevron-left"></i></div></div>
+      <div class="row" onclick="toast('עריכת אימייל')"><div class="ricon"><i data-lucide="mail"></i></div><div class="rlabel">אימייל</div><div class="rval">noa@example.com <i data-lucide="chevron-left"></i></div></div>
+      <div class="row" onclick="toast('חוף בית')"><div class="ricon"><i data-lucide="map-pin"></i></div><div class="rlabel">חוף בית</div><div class="rval">חוף הצוק, נתניה <i data-lucide="chevron-left"></i></div></div>
+      <div class="row" onclick="toast('שינוי סיסמה')"><div class="ricon"><i data-lucide="lock"></i></div><div class="rlabel">שינוי סיסמה</div><div class="rval"><i data-lucide="chevron-left"></i></div></div>
+    </div>
+
+    <div class="sec">תצוגה</div>
+    <div class="group">
+      <div class="row" style="cursor:default"><div class="ricon"><i data-lucide="palette"></i></div><div class="rlabel">מצב תצוגה</div></div>
+      <div class="segwrap"><div class="seg" id="themeSeg">
+        <div data-m="brazil" onclick="setMode('brazil')">ברזיל</div>
+        <div data-m="dark" onclick="setMode('dark')">כהה</div>
+        <div data-m="auto" onclick="setMode('auto')">אוטומטי</div>
+      </div></div>
+      <div class="row" onclick="toast('בחירת שפה')"><div class="ricon"><i data-lucide="languages"></i></div><div class="rlabel">שפה</div><div class="rval">עברית <i data-lucide="chevron-left"></i></div></div>
+    </div>
+
+    <div class="sec">התראות</div>
+    <div class="group">
+      <div class="row"><div class="ricon"><i data-lucide="bell"></i></div><div class="rlabel">התראות דחיפה<small>מעגלים, קודוס, הודעות</small></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="row"><div class="ricon"><i data-lucide="mail"></i></div><div class="rlabel">עדכוני אימייל<small>דייג'סט שבועי</small></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+      <div class="row"><div class="ricon"><i data-lucide="trophy"></i></div><div class="rlabel">אתגרים ותזכורות</div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+
+    <div class="sec">פרטיות</div>
+    <div class="group">
+      <div class="row"><div class="ricon"><i data-lucide="eye"></i></div><div class="rlabel">פרופיל ציבורי<small>כולם יכולים לראות את הפעילות שלך</small></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="row"><div class="ricon"><i data-lucide="navigation"></i></div><div class="rlabel">שיתוף מיקום<small>ברמת חוף בלבד</small></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="row" onclick="toast('רשימת חסומים')"><div class="ricon"><i data-lucide="user-x"></i></div><div class="rlabel">משתמשים חסומים</div><div class="rval">0 <i data-lucide="chevron-left"></i></div></div>
+    </div>
+
+    <div class="sec">חשבונות מקושרים</div>
+    <div class="group">
+      <div class="row" style="cursor:default"><div class="ricon"><i data-lucide="music"></i></div><div class="rlabel">Spotify</div><span class="conn linked">מחובר</span></div>
+      <div class="row" style="cursor:default"><div class="ricon"><i data-lucide="play"></i></div><div class="rlabel">YouTube Music</div><button class="conn link" onclick="toast('מחבר ל-YouTube')">חבר</button></div>
+      <div class="row" style="cursor:default"><div class="ricon"><i data-lucide="music-2"></i></div><div class="rlabel">Apple Music</div><button class="conn link" onclick="toast('מחבר ל-Apple')">חבר</button></div>
+    </div>
+
+    <div class="sec">ניהול</div>
+    <div class="group">
+      <a class="row" href="altinha-admin.html" style="text-decoration:none;color:inherit"><div class="ricon"><i data-lucide="shield"></i></div><div class="rlabel">אזור ניהול<small>תרגילים ומיקומים (למורשים)</small></div><div class="rval"><i data-lucide="chevron-left"></i></div></a>
+    </div>
+
+    <div class="sec">כללי</div>
+    <div class="group">
+      <div class="row" onclick="toast('אודות GINGA')"><div class="ricon"><i data-lucide="info"></i></div><div class="rlabel">אודות</div><div class="rval"><i data-lucide="chevron-left"></i></div></div>
+      <div class="row" onclick="toast('תנאי שימוש')"><div class="ricon"><i data-lucide="file-text"></i></div><div class="rlabel">תנאי שימוש ומדיניות פרטיות</div><div class="rval"><i data-lucide="chevron-left"></i></div></div>
+      <div class="row" onclick="toast('עזרה ותמיכה')"><div class="ricon"><i data-lucide="help-circle"></i></div><div class="rlabel">עזרה ותמיכה</div><div class="rval"><i data-lucide="chevron-left"></i></div></div>
+    </div>
+
+    <div class="sec">חשבון</div>
+    <div class="group">
+      <a class="row" href="altinha-welcome.html" style="text-decoration:none;color:inherit"><div class="ricon"><i data-lucide="log-out"></i></div><div class="rlabel">התנתקות</div><div class="rval"><i data-lucide="chevron-left"></i></div></a>
+      <div class="row danger" onclick="toast('מחיקת חשבון — דורש אישור')"><div class="ricon"><i data-lucide="trash-2"></i></div><div class="rlabel">מחיקת חשבון</div><div class="rval"><i data-lucide="chevron-left"></i></div></div>
+    </div>
+
+    <div class="ver">GINGA · גרסה 1.0</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function resolve(mode){ if(mode==='auto'){ return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'brazil'; } return mode; }
+function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); icons(); }
+function setMode(mode){
+  try{ localStorage.setItem('ginga-theme-mode', mode); localStorage.setItem('ginga-theme', resolve(mode)); }catch(e){}
+  document.querySelectorAll('#themeSeg div').forEach(d=>d.classList.toggle('on', d.dataset.m===mode));
+  applyTheme(resolve(mode));
+  toast(mode==='auto'?'מצב תצוגה: אוטומטי (לפי המכשיר)': mode==='dark'?'מצב תצוגה: כהה':'מצב תצוגה: ברזיל');
+}
+(function(){
+  let mode='brazil'; try{ mode=localStorage.getItem('ginga-theme-mode')||localStorage.getItem('ginga-theme')||'brazil'; }catch(e){}
+  document.querySelectorAll('#themeSeg div').forEach(d=>d.classList.toggle('on', d.dataset.m===mode));
+  applyTheme(resolve(mode));
+})();
+let tT; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),1900); }
+i

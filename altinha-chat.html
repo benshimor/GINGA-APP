@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — צ'אט</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.55); --glass-2:rgba(255,255,255,.75); --glass-brd:rgba(255,255,255,.7);
+    --pad:18px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.08);
+    --header-bg:linear-gradient(160deg, var(--green) 0%, #24471F 100%); --notch:var(--green);
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.075); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5); --header-bg:#111318; --notch:#0A0B0D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg-outer);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--notch); position:relative; z-index:30}
+  .notch::after{content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:120px; height:18px; background:var(--notch); border-radius:0 0 14px 14px}
+  .panel{position:absolute; inset:26px 0 0 0; display:none; flex-direction:column}
+  .panel.on{display:flex}
+
+  .hdr{display:flex; align-items:center; gap:11px; padding:14px var(--pad); background:var(--header-bg); color:#F3F0E9}
+  .hdr .back{cursor:pointer} .hdr .back svg{width:24px;height:24px}
+  .brand{display:flex; align-items:center; gap:9px}
+  .brand img{width:30px; height:30px}
+  .brand span{font-size:18px; font-weight:600; letter-spacing:.5px}
+  .hdr .ttl{font-size:17px; font-weight:600; margin-inline-start:auto}
+  .themebtn{width:36px; height:36px; border-radius:11px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); color:#F3F0E9; display:flex; align-items:center; justify-content:center; cursor:pointer}
+  .themebtn svg{width:18px;height:18px}
+
+  .list{flex:1; overflow-y:auto; padding:6px 0 20px}
+  .row{display:flex; align-items:center; gap:13px; padding:13px var(--pad); cursor:pointer}
+  .row:active{background:var(--glass)}
+  .rav{width:50px; height:50px; border-radius:15px; flex:0 0 auto; display:flex; align-items:center; justify-content:center}
+  .rav svg{width:23px; height:23px}
+  .rmain{flex:1; min-width:0; border-bottom:1px solid var(--line); padding-bottom:13px}
+  .rtop{display:flex; justify-content:space-between; align-items:baseline}
+  .rname{font-size:15px; font-weight:600; display:flex; align-items:center; gap:6px}
+  .rtime{font-size:11.5px; color:var(--muted)}
+  .rlast{font-size:13px; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:230px}
+  .unread{background:var(--green); color:#F3F0E9; font-size:11px; font-weight:600; min-width:20px; height:20px; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:0 6px; margin-inline-start:auto}
+  .rtag{font-size:10px; font-weight:600; padding:2px 8px; border-radius:8px}
+  .tg-circle{background:rgba(45,90,39,.12); color:var(--green)} .tg-beach{background:rgba(230,168,0,.14); color:var(--mustard-2)}
+
+  .cvsub{font-size:11.5px; opacity:.85; margin-top:1px}
+  .cvav{width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .cvav svg{width:20px; height:20px}
+  .thread{flex:1; overflow-y:auto; padding:16px var(--pad); display:flex; flex-direction:column; gap:9px; background:var(--bg-outer)}
+  .bub{max-width:78%; padding:10px 13px; border-radius:16px; font-size:13.5px; line-height:1.45}
+  .bub.them{align-self:flex-start; background:var(--glass-2); border:1px solid var(--line); border-top-right-radius:5px}
+  .bub.me{align-self:flex-end; background:var(--green); color:#F3F0E9; border-top-left-radius:5px}
+  .bub .nm{font-size:11px; font-weight:600; color:var(--mustard-2); margin-bottom:3px}
+  .bub .tm{font-size:10px; opacity:.6; margin-top:3px; text-align:left}
+  .sysmsg{align-self:center; font-size:11.5px; color:var(--muted); background:var(--glass); border:1px solid var(--line); padding:4px 13px; border-radius:12px}
+
+  .inputbar{display:flex; gap:9px; padding:10px 14px; border-top:1px solid var(--line); align-items:center; background:var(--bg)}
+  .inputbar input{flex:1; border:1px solid var(--line); border-radius:22px; padding:12px 16px; font-size:14px; font-family:inherit; background:var(--glass-2); color:var(--ink); outline:none}
+  .inputbar input:focus{border-color:var(--green)}
+  .send{width:44px; height:44px; border-radius:50%; background:var(--green); color:#F3F0E9; border:none; cursor:pointer; flex:0 0 auto; display:flex; align-items:center; justify-content:center}
+  .send svg{width:19px;height:19px}
+
+  .nav{height:70px; background:var(--bg); border-top:1px solid var(--line); display:flex; justify-content:space-around; align-items:center; padding-bottom:6px}
+  .nav a{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--muted); text-decoration:none; font-weight:500}
+  .nav a svg{width:23px;height:23px}
+  .nav a.on{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="panel on" id="pList">
+    <div class="hdr">
+      <div class="brand"><img src="logo.png" alt=""><span>GINGA</span></div>
+      <div class="ttl">צ'אט</div>
+      <button class="themebtn" id="themeBtn" onclick="toggleTheme()" aria-label="החלף מצב תצוגה"><i data-lucide="moon" id="themeIc"></i></button>
+    </div>
+    <div class="list" id="chatList"></div>
+    <div class="nav">
+      <a href="altinha-training.html"><i data-lucide="book-open"></i>תרגול</a>
+      <a href="altinha-feed.html"><i data-lucide="activity"></i>פעילות</a>
+      <a href="altinha-map.html"><i data-lucide="map-pin"></i>מפה</a>
+      <a href="altinha-profile.html"><i data-lucide="user"></i>פרופיל</a>
+    </div>
+  </div>
+
+  <div class="panel" id="pConv">
+    <div class="hdr">
+      <span class="back" onclick="showList()"><i data-lucide="chevron-right"></i></span>
+      <div class="cvav" id="cvav"><i data-lucide="users"></i></div>
+      <div><div class="cvname" id="cvname" style="font-size:16px;font-weight:600">—</div><div class="cvsub" id="cvsub">—</div></div>
+    </div>
+    <div class="thread" id="thread"></div>
+    <div class="inputbar">
+      <input id="msgin" placeholder="הודעה…" onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="send" onclick="sendMsg()"><i data-lucide="send"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+const CHATS=[
+  {id:0, name:"מעגל של דניאל · גורדון", tag:"circle", icon:"users", color:"rgba(45,90,39,.12)", fg:"var(--green)", last:"דניאל: מי מביא כדור נוסף?", time:"עכשיו", unread:3, sub:"6 משתתפים · פעיל עכשיו"},
+  {id:1, name:'חוף גורדון · ת"א', tag:"beach", icon:"map-pin", color:"rgba(230,168,0,.14)", fg:"var(--mustard-2)", last:"מאיה: מחר ב-17:00 כרגיל", time:"12 דק'", unread:0, sub:"84 חברים"},
+  {id:2, name:"מעגל שבת · הילטון", tag:"circle", icon:"users", color:"rgba(45,90,39,.12)", fg:"var(--green)", last:"רון: אני בפנים, מגיע עם 2", time:"לפני שעה", unread:1, sub:"4 משתתפים"},
+  {id:3, name:"נתניה · חוף הצוק", tag:"beach", icon:"map-pin", color:"rgba(230,168,0,.14)", fg:"var(--mustard-2)", last:"שיר: מישהו משחק היום בערב?", time:"3 ש'", unread:0, sub:"37 חברים"},
+  {id:4, name:"צ'יקו", tag:"dm", icon:"user", color:"rgba(45,90,39,.1)", fg:"var(--green-2)", last:"אתה: תודה על הטיפ!", time:"אתמול", unread:0, sub:"מחובר לאחרונה היום"},
+];
+const THREADS={
+  0:[["sys","דניאל פתח מעגל בחוף גורדון"],["them","דניאל","מי מגיע היום? צריך עוד 2 לסגור מעגל","17:40"],["them","מאיה","אני בדרך! 10 דקות","17:41"],["me","סבבה, אני מגיע גם. מביא כדור","17:42"],["them","דניאל","מלך. מי מביא כדור נוסף?","17:43"]],
+  1:[["them","מאיה","מחר ב-17:00 כרגיל, מי בפנים?","אתמול"],["me","אני!","אתמול"],["them","יוסי","גם אני, אביא מים","אתמול"]],
+  2:[["sys","מעגל שבת · הילטון"],["them","רון","אני בפנים, מגיע עם 2","לפני שעה"]],
+  3:[["them","שיר","מישהו משחק היום בערב בצוק?","לפני 3 שעות"]],
+  4:[["them","צ׳יקו","נסה להתחיל ראבונה מגובה נמוך, יותר קל","אתמול"],["me","תודה על הטיפ!","אתמול"]],
+};
+let cur=0;
+function renderList(){
+  const w=$("#chatList"); w.innerHTML="";
+  CHATS.forEach(c=>{
+    const el=document.createElement('div'); el.className='row'; el.onclick=()=>openChat(c.id);
+    const tag = c.tag==='circle'?'<span class="rtag tg-circle">מעגל</span>': c.tag==='beach'?'<span class="rtag tg-beach">חוף</span>':'';
+    el.innerHTML=`<div class="rav" style="background:${c.color};color:${c.fg}"><i data-lucide="${c.icon}"></i></div>
+      <div class="rmain"><div class="rtop"><div class="rname">${c.name}${tag}</div><div class="rtime">${c.time}</div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div class="rlast">${c.last}</div>${c.unread?`<span class="unread">${c.unread}</span>`:''}</div></

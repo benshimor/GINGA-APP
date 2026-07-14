@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — ברוכים הבאים</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.55); --glass-2:rgba(255,255,255,.75); --glass-brd:rgba(255,255,255,.7);
+    --pad:24px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.08);
+    --body-bg:radial-gradient(120% 55% at 50% 0%, #E9F0E4 0%, transparent 55%), var(--bg-outer);
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.075); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5); --body-bg:#050506;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg-outer);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--bg); position:relative; z-index:30}
+
+  .panel{position:absolute; inset:26px 0 0 0; display:none; flex-direction:column; background:var(--body-bg)}
+  .panel.on{display:flex}
+  .themebtn{position:absolute; top:14px; left:16px; z-index:5; width:38px; height:38px; border-radius:12px; background:var(--glass); border:1px solid var(--line); color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(8px)}
+  .themebtn svg{width:19px; height:19px}
+
+  /* welcome */
+  .hero{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:0 var(--pad); position:relative}
+  .glow{position:absolute; width:280px; height:280px; border-radius:50%; filter:blur(70px); opacity:.5; top:8%; background:radial-gradient(circle, rgba(45,90,39,.4), transparent 70%); pointer-events:none}
+  .logo{width:180px; height:180px; margin-bottom:22px; position:relative; filter:drop-shadow(0 16px 30px rgba(44,62,80,.2))}
+  .htitle{font-size:34px; font-weight:600; line-height:1.12; position:relative}
+  .htitle .g{color:var(--green)}
+  .tag{font-size:15px; color:var(--muted); margin-top:14px; line-height:1.6; max-width:300px}
+  .feats{display:flex; justify-content:center; gap:8px; margin-top:22px; flex-wrap:wrap}
+  .feat{display:inline-flex; align-items:center; gap:6px; background:var(--glass); border:1px solid var(--line); backdrop-filter:blur(8px); padding:8px 13px; border-radius:20px; font-size:12.5px; font-weight:500}
+  .feat svg{width:15px; height:15px; color:var(--green)}
+  .cta{padding:20px var(--pad) 30px; position:relative}
+  .primary{width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:16px; border:none; border-radius:15px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; background:var(--green); color:#F3F0E9; box-shadow:0 10px 24px rgba(45,90,39,.3)}
+  .primary svg{width:19px; height:19px}
+  .link{text-align:center; margin-top:16px; font-size:14px; color:var(--muted)}
+  .link b{color:var(--green); font-weight:600; cursor:pointer}
+
+  /* auth */
+  .ahead{padding:28px var(--pad) 18px; text-align:center; position:relative}
+  .ahead .back{position:absolute; top:14px; right:16px; color:var(--ink); cursor:pointer}
+  .ahead .back svg{width:24px; height:24px}
+  .ahead img{width:66px; height:66px; filter:drop-shadow(0 8px 18px rgba(44,62,80,.18))}
+  .ahead .brandsm{font-size:17px; font-weight:600; margin-top:8px; letter-spacing:1px}
+  .ahead h2{font-size:22px; font-weight:600; margin-top:12px}
+  .ahead p{font-size:13.5px; color:var(--muted); margin-top:4px}
+  .aform{flex:1; padding:14px var(--pad) 28px}
+  .social{display:flex; flex-direction:column; gap:10px}
+  .sbtn{display:flex; align-items:center; justify-content:center; gap:9px; padding:14px; border-radius:14px; font-size:14.5px; font-weight:500; cursor:pointer; border:1px solid var(--line); background:var(--glass); color:var(--ink); font-family:inherit}
+  .sbtn svg{width:18px; height:18px}
+  .sbtn.apple{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+  .divider{display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--muted); font-size:12.5px}
+  .divider::before,.divider::after{content:""; flex:1; height:1px; background:var(--line)}
+  .field{margin-bottom:12px}
+  .field label{font-size:12.5px; font-weight:500; color:var(--muted); display:block; margin-bottom:6px; margin-inline-start:2px}
+  .field input{width:100%; border:1px solid var(--line); border-radius:14px; padding:14px; font-size:14.5px; font-family:inherit; outline:none; background:var(--glass-2); color:var(--ink)}
+  .field input:focus{border-color:var(--green)}
+  .go{width:100%; padding:15px; border:none; border-radius:15px; font-size:15.5px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:6px; background:var(--green); color:#F3F0E9}
+  .swap{text-align:center; margin-top:16px; font-size:13.5px; color:var(--muted)}
+  .swap b{color:var(--green); font-weight:600; cursor:pointer}
+  .terms{text-align:center; font-size:11px; color:var(--muted); margin-top:14px; line-height:1.5}
+
+  /* onboarding */
+  .ob{flex:1; padding:28px var(--pad); display:flex; flex-direction:column}
+  .obh{font-size:22px; font-weight:600; text-align:center}
+  .obs{font-size:14px; color:var(--muted); text-align:center; margin-top:8px; line-height:1.5}
+  .levels{margin-top:24px; display:flex; flex-direction:column; gap:12px}
+  .lvopt{display:flex; align-items:center; gap:14px; background:var(--glass); border:1.5px solid var(--line); border-radius:18px; padding:16px; cursor:pointer; transition:.15s; backdrop-filter:blur(8px)}
+  .lvopt.sel{border-color:var(--green); background:rgba(45,90,39,.08)}
+  .lvopt .em{width:44px; height:44px; border-radius:13px; background:rgba(45,90,39,.1); color:var(--green); display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .lvopt .em svg{width:22px; height:22px}
+  .lvopt .t b{font-size:15.5px; font-weight:600; display:block}
+  .lvopt .t small{font-size:12.5px; color:var(--muted)}
+  .obgo{margin-top:auto; width:100%; padding:16px; border:none; border-radius:15px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; background:var(--green); color:#F3F0E9}
+  .obgo:disabled{opacity:.45}
+  .dots{display:flex; gap:7px; justify-content:center; margin-top:18px}
+  .dots i{width:8px; height:8px; border-radius:50%; background:var(--line)}
+  .dots i.on{background:var(--green); width:22px; border-radius:4px}
+
+  .toast{position:absolute; bottom:40px; left:50%; transform:translateX(-50%) translateY(10px); z-index:60; background:#2C3E50; color:#F3F0E9; padding:11px 18px; border-radius:14px; font-size:13.5px; font-weight:500; opacity:0; transition:.3s}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+  <button class="themebtn" id="themeBtn" onclick="toggleTheme()" aria-label="החלף מצב תצוגה"><i data-lucide="moon" id="themeIc"></i></button>
+
+  <div class="panel on" id="pWelcome">
+    <div class="hero">
+      <div class="glow"></div>
+      <img class="logo" src="logo.png" alt="GINGA">
+      <div class="htitle">שחק. שתף.<br><span class="g">תשתפר.</span></div>
+      <div class="tag">הבית של קהילת האלטיניה בישראל — למד טריקים, שתף התקדמות, ומצא מעגל לשחק בו.</div>
+      <div class="feats">
+        <span class="feat"><i data-lucide="target"></i> תרגול מדורג</span>
+        <span class="feat"><i data-lucide="activity"></i> קהילה</span>
+        <span class="feat"><i data-lucide="map-pin"></i> מעגלים</span>
+      </div>
+    </div>
+    <div class="cta">
+      <button class="primary" onclick="go('pAuth'); setMode('signup')">בוא נתחיל <i data-lucide="arrow-left"></i></button>
+      <div class="link">כבר יש לך חשבון? <b onclick="go('pAuth'); setMode('login')">התחבר</b></div>
+    </div>
+  </div>
+
+  <div class="panel" id="pAuth">
+    <div class="ahead">
+      <span class="back" onclick="go('pWelcome')"><i data-lucide="chevron-right"></i></span>
+      <img src="logo.png" alt="">
+      <div class="brandsm">GINGA</div>
+      <h2 id="aTitle">יצירת חשבון</h2>
+      <p id="aSub">הצטרף לקהילה בכמה שניות</p>
+    </div>
+    <div class="aform">
+      <div class="social">
+        <button class="sbtn apple" onclick="afterAuth()">המשך עם Apple</button>
+        <button class="sbtn" onclick="afterAuth()">המשך עם Google</button>
+        <button class="sbtn" onclick="afterAuth()"><i data-lucide="smartphone"></i> המשך עם מספר טלפון</button>
+      </div>
+      <div class="divider">או עם אימייל</div>
+      <div class="field" id="nameField"><label>שם מלא</label><input type="text" placeholder="נועה לוי"></div>
+      <div class="field"><label>אימייל</label><input type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>סיסמה</label><input type="password" placeholder="••••••••"></div>
+      <button class="go" id="aGo" onclick="afterAuth()">יצירת חשבון</button>
+      <div class="swap" id="aSwap">כבר רשום? <b onclick="setMode('login')">התחבר</b></div>
+      <div class="terms" id="aTerms">בהרשמה אתה מאשר את תנאי השימוש ומדיניות הפרטיות</div>
+    </div>
+  </div>
+
+  <div class="panel" id="pOnboard">
+    <div class="ob">
+      <div class="obh">מה הרמה שלך?</div>
+      <div class="obs">נתאים לך את מסלול הלמידה. תמיד אפשר לשנות.</div>
+      <div class="levels" id="levels">
+        <div class="lvopt" data-l="new" onclick="selLevel(this)"><div class="em"><i data-lucide="sprout"></i></div><div class="t"><b>חדש לגמרי</b><small>לא שיחקתי אף פעם, רוצה ללמוד מאפס</small></div></div>
+        <div class="lvopt" data-l="some" onclick="selLevel(this)"><div class="em"><i data-lucide="circle-dot"></i></div><div class="t"><b>קצת משחק</b><small>יודע כמה טריקים בסיסיים</small></div></div>
+        <div class="lvopt" data-l="pro" onclick="selLevel(this)"><div class="em"><i data-lucide="flame"></i></div><div class="t"><b>מנוסה</b><small>משחק קבוע, רוצה להשתפר ולתעד</small></div></div>
+      </div>
+      <button class="obgo" id="obGo" disabled onclick="enterApp()">בוא נתחיל</button>
+      <div class="dots"><i></i><i></i><i class="on"></i></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function go(id){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on')); $("#"+id).classList.add('on'); icons(); }
+let mode='signup';
+function setMode(m){
+  mode=m; const signup = m==='signup';
+  $("#aTitle").textContent = signup ? 'יצירת חשבון' : 'כניסה';
+  $("#aSub").textContent   = signup ? 'הצטרף לקהילה בכמה שניות' : 'טוב לראות אותך שוב';
+  $("#aGo").textContent    = signup ? 'יצירת חשבון' : 'התחבר';
+  $("#nameField").style.display = signup ? 'block' : 'none';
+  $("#aTerms").style.display = signup ? 'block' : 'none';
+  $("#aSwap").innerHTML = signup ? 'כבר רשום? <b onclick="setMode(\'login\')">התחבר</b>' : 'אין לך חשבון? <b onclick="setMode(\'signup\')">הרשם</b>';
+}
+function afterAuth(){ if(mode==='signup') go('pOnboard'); else location.href='altinha-feed.html'; }
+let level=null;
+function selLevel(el){ document.querySelectorAll('.lvopt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); level=el.dataset.l; $("#obGo").disabled=false; }
+function enterApp(){ location.href = (level==='pro') ? 'altinha-feed.html' : 'altinha-training.html'; }
+function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); try{localStorage.setItem('ginga-theme',t)}catch(e){}
+  const ic=document.getElementById('themeIc'); if(ic){ ic.setAttribute('data-lucide', t==='dark'?'sun':'moon'); } icons(); }
+function toggleTheme(){ const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'brazil'; applyTheme(cur==='dark'?'brazil':'dark'); }
+(function(){ let t='brazil'; try{ t=localStorage.getItem('ginga-theme')||'brazil'; }catch(e){} applyTheme(t); })();
+let tT; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),1800); }
+icons();
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

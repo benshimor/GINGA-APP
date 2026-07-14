@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — אתגרים</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00; --coral:#C0603D;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.6); --glass-2:rgba(255,255,255,.8); --glass-brd:rgba(255,255,255,.7);
+    --pad:18px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.08);
+    --header-bg:linear-gradient(160deg, var(--green) 0%, #24471F 100%); --notch:var(--green); --nav-bg:#FBF8F2;
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E; --coral:#E08157;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.05); --glass-2:rgba(255,255,255,.08); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5); --header-bg:#111318; --notch:#0A0B0D; --nav-bg:#0A0B0D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg-outer);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--notch); position:relative; z-index:30}
+  .notch::after{content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:120px; height:18px; background:var(--notch); border-radius:0 0 14px 14px}
+
+  .hdr{display:flex; align-items:center; gap:11px; padding:14px var(--pad); background:var(--header-bg); color:#F3F0E9}
+  .hdr .back{cursor:pointer; color:#F3F0E9} .hdr .back svg{width:24px;height:24px}
+  .hdr .ttl{font-size:18px; font-weight:600}
+  .themebtn{margin-inline-start:auto; width:36px; height:36px; border-radius:11px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); color:#F3F0E9; display:flex; align-items:center; justify-content:center; cursor:pointer}
+  .themebtn svg{width:18px;height:18px}
+
+  .body{flex:1; overflow-y:auto; padding:16px var(--pad) 92px}
+  .body::-webkit-scrollbar{display:none}
+
+  .hero{background:linear-gradient(150deg, rgba(45,90,39,.14), rgba(230,168,0,.14)); border:1px solid var(--glass-brd); border-radius:20px; padding:18px; box-shadow:var(--shadow); backdrop-filter:blur(10px)}
+  .hbadge{display:inline-flex; align-items:center; gap:6px; background:var(--mustard); color:#3a2a00; font-size:11.5px; font-weight:600; padding:5px 11px; border-radius:20px}
+  .hbadge svg{width:14px;height:14px}
+  .htitle{font-size:24px; font-weight:600; margin-top:12px}
+  .hdesc{font-size:13.5px; color:var(--muted); margin-top:6px; line-height:1.5}
+  .hmeta{display:flex; gap:18px; margin-top:14px}
+  .hmeta div{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink); font-weight:500}
+  .hmeta svg{width:15px;height:15px; color:var(--green)}
+  .hbtn{width:100%; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; background:var(--green); color:#F3F0E9; border:none; border-radius:14px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit}
+  .hbtn svg{width:18px;height:18px}
+  .hbtn.done{background:rgba(45,90,39,.14); color:var(--green)}
+
+  .stitle{font-size:16px; font-weight:600; margin:22px 2px 12px; display:flex; align-items:center; gap:8px}
+  .stitle svg{width:18px;height:18px; color:var(--mustard-2)}
+
+  .lb{background:var(--glass); border:1px solid var(--glass-brd); border-radius:16px; overflow:hidden; backdrop-filter:blur(10px); box-shadow:var(--shadow)}
+  .lrow{display:flex; align-items:center; gap:12px; padding:12px 14px}
+  .lrow + .lrow{border-top:1px solid var(--line)}
+  .lrow.me{background:rgba(45,90,39,.08)}
+  .rank{width:26px; text-align:center; font-size:14px; font-weight:600; color:var(--muted); flex:0 0 auto}
+  .rank.medal{color:var(--mustard-2)}
+  .lav{width:38px; height:38px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:#F3F0E9; font-weight:600; font-size:15px}
+  .lname{flex:1; font-size:14.5px; font-weight:500}
+  .lname small{display:block; font-size:11.5px; color:var(--muted); font-weight:400; margin-top:1px}
+  .lscore{font-size:14px; font-weight:600; color:var(--green); display:flex; align-items:center; gap:5px}
+  .lscore svg{width:15px;height:15px}
+
+  .past{display:flex; align-items:center; gap:12px; background:var(--glass); border:1px solid var(--glass-brd); border-radius:14px; padding:13px 14px; margin-bottom:10px; backdrop-filter:blur(8px)}
+  .past .pi{width:40px;height:40px;border-radius:12px;background:rgba(44,62,80,.06);color:var(--muted);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .past .pi svg{width:19px;height:19px}
+  .past .pt{flex:1}
+  .past .pt b{font-size:14px;font-weight:600;display:block}
+  .past .pt span{font-size:12px;color:var(--muted)}
+  .past .win{font-size:11.5px;color:var(--mustard-2);font-weight:600}
+
+  .nav{position:absolute; bottom:0; left:0; right:0; height:70px; background:var(--nav-bg); border-top:1px solid var(--line); display:flex; justify-content:space-around; align-items:center; padding-bottom:6px; z-index:20; box-shadow:0 -4px 18px rgba(44,62,80,.08)}
+  .nav a{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--muted); text-decoration:none; font-weight:500}
+  .nav a svg{width:23px;height:23px}
+  .nav a.on{color:var(--green)}
+  .toast{position:absolute; bottom:86px; left:50%; transform:translateX(-50%) translateY(10px); z-index:50; background:#2C3E50; color:#F3F0E9; padding:12px 18px; border-radius:14px; font-size:13.5px; font-weight:500; opacity:0; transition:.3s}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="hdr">
+    <a class="back" href="altinha-feed.html"><i data-lucide="chevron-right"></i></a>
+    <div class="ttl">אתגרים</div>
+    <button class="themebtn" onclick="toggleTheme()" aria-label="החלף מצב תצוגה"><i data-lucide="moon" id="themeIc"></i></button>
+  </div>
+
+  <div class="body">
+    <div class="hero">
+      <span class="hbadge"><i data-lucide="flame"></i> אתגר השבוע</span>
+      <div class="htitle">סקורפיון</div>
+      <div class="hdesc">בצע בעיטת עקרב נקייה, שתף לפיד, וזכה ב-XP בונוס. השחקנים המובילים עולים ללוח.</div>
+      <div class="hmeta">
+        <div><i data-lucide="users"></i> 142 משתתפים</div>
+        <div><i data-lucide="clock"></i> נותרו 3 ימים</div>
+        <div><i data-lucide="zap"></i> +200 XP</div>
+      </div>
+      <button class="hbtn" id="joinBtn" onclick="joinChallenge()"><i data-lucide="camera"></i> אני משתתף</button>
+    </div>
+
+    <div class="stitle"><i data-lucide="trophy"></i> לוח מובילים</div>
+    <div class="lb" id="lb"></div>
+
+    <div class="stitle"><i data-lucide="history"></i> אתגרים קודמים</div>
+    <div class="past"><div class="pi"><i data-lucide="award"></i></div><div class="pt"><b>ראבונה באוויר</b><span>שבוע שעבר · 98 משתתפים</span></div><div class="win">זכה: דניאל</div></div>
+    <div class="past"><div class="pi"><i data-lucide="award"></i></div><div class="pt"><b>Around the World</b><span>לפני שבועיים · 76 משתתפים</span></div><div class="win">זכה: מאיה</div></div>
+  </div>
+
+  <div class="nav">
+    <a href="altinha-training.html"><i data-lucide="book-open"></i>תרגול</a>
+    <a href="altinha-feed.html"><i data-lucide="activity"></i>פעילות</a>
+    <a href="altinha-map.html"><i data-lucide="map-pin"></i>מפה</a>
+    <a href="altinha-profile.html"><i data-lucide="user"></i>פרופיל</a>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+const BOARD=[
+  {name:"מאיה", sub:"נתניה", score:"47", color:"#C98F00", me:false},
+  {name:"דניאל", sub:"תל אביב", score:"41", color:"#2D5A27", me:false},
+  {name:"רון", sub:"הרצליה", score:"38", color:"#3B7233", me:false},
+  {name:"צ'יקו", sub:"תל אביב", score:"33", color:"#C0603D", me:false},
+  {name:"שיר", sub:"חיפה", score:"29", color:"#3B7233", me:false},
+  {name:"נועה (את)", sub:"נתניה", score:"24", color:"#2D5A27", me:true},
+];
+function render(){
+  const w=$("#lb"); w.innerHTML="";
+  BOARD.forEach((p,i)=>{
+    const rank=i+1; const medal=rank<=3;
+    const el=document.createElement('div'); el.className='lrow'+(p.me?' me':'');
+    el.innerHTML=`<div class="rank ${medal?'medal':''}">${rank}</div>
+      <div class="lav" style="background:${p.color}">${p.name[0]}</div>
+      <div class="lname">${p.name}<small>${p.sub}</small></div>
+      <div class="lscore"><i data-lucide="flame"></i> ${p.score}</div>`;
+    w.appendChild(el);
+  });
+  icons();
+}
+render();
+let joined=false;
+function joinChallenge(){
+  const b=$("#joinBtn");
+  if(!joined){ joined=true; b.className='hbtn done'; b.innerHTML='<i data-lucide="check"></i> אתה משתתף'; toast('נרשמת לאתגר! שתף ניסיון בפיד'); }
+  else { location.href='altinha-feed.html'; }
+  icons();
+}
+function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); try{localStorage.setItem('ginga-theme',t)}catch(e){}
+  const ic=document.getElementById('themeIc'); if(ic){ ic.setAttribute('data-lucide', t==='dark'?'sun':'moon'); } icons(); }
+function toggleTheme(){ const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'brazil'; applyTheme(cur==='dark'?'brazil':'dark'); }
+(function(){ let t='brazil'; try{ t=localStorage.getItem('ginga-theme')||'brazil'; }catch(e){} applyTheme(t); })();
+let tT; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),2000); }
+i

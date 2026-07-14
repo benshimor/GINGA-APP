@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — פרופיל</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00; --coral:#C0603D;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.6); --glass-2:rgba(255,255,255,.8); --glass-brd:rgba(255,255,255,.7);
+    --pad:18px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.08);
+    --header-bg:linear-gradient(160deg, var(--green) 0%, #24471F 100%); --notch:var(--green); --sheet-bg:#FBF8F2;
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E; --coral:#E08157;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.05); --glass-2:rgba(255,255,255,.08); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5); --header-bg:#111318; --notch:#0A0B0D; --sheet-bg:#131519;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg-outer);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--notch); position:relative; z-index:30}
+  .notch::after{content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:120px; height:18px; background:var(--notch); border-radius:0 0 14px 14px}
+  .body{flex:1; overflow-y:auto; padding-bottom:86px}
+  .body::-webkit-scrollbar{display:none}
+
+  .head{background:var(--header-bg); color:#F3F0E9; padding:16px var(--pad) 22px}
+  .htop{display:flex; justify-content:space-between; align-items:center}
+  .htop .brand{display:flex; align-items:center; gap:7px; font-weight:600}
+  .htop .brand img{width:24px; height:24px}
+  .htop .acts{display:flex; gap:8px}
+  .htop .acts a,.htop .acts button{width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); color:#F3F0E9; display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none}
+  .htop .acts svg{width:17px;height:17px}
+  .pwrap{display:flex; align-items:center; gap:15px; margin-top:16px}
+  .pic{width:84px; height:84px; border-radius:50%; background:rgba(255,255,255,.16); border:2px solid rgba(255,255,255,.4); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:600; flex:0 0 auto}
+  .pinfo .pname{font-size:21px; font-weight:600}
+  .pinfo .phandle{font-size:13px; opacity:.82; margin-top:2px}
+  .pinfo .ploc{display:inline-flex; align-items:center; gap:5px; margin-top:8px; font-size:13.5px; opacity:.95}
+  .pinfo .ploc svg{width:14px;height:14px}
+  .badgeline{margin-top:14px}
+  .plevel{display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.16); padding:6px 12px; border-radius:14px; font-size:12.5px; font-weight:500}
+  .plevel svg{width:14px;height:14px}
+  .bio{font-size:13px; opacity:.9; margin-top:11px; line-height:1.5}
+  .statsrow{display:flex; margin-top:16px; background:rgba(255,255,255,.12); border-radius:16px; overflow:hidden}
+  .stat{flex:1; text-align:center; padding:11px 6px; cursor:pointer}
+  .stat + .stat{border-right:1px solid rgba(255,255,255,.15)}
+  .stat b{font-size:18px; font-weight:600; display:block}
+  .stat span{font-size:11.5px; opacity:.85}
+  .btnrow{display:flex; gap:10px; margin-top:16px}
+  .b{flex:1; display:flex; align-items:center; justify-content:center; gap:7px; padding:11px; border-radius:13px; font-size:14px; font-weight:600; border:none; cursor:pointer; font-family:inherit}
+  .b svg{width:16px;height:16px}
+  .b.fill{background:#fff; color:var(--green)}
+  html[data-theme="dark"] .b.fill{background:#2A2E36; color:#F3F0E9}
+  .b.out{background:rgba(255,255,255,.14); color:#F3F0E9; border:1.5px solid rgba(255,255,255,.4)}
+
+  .maplink{display:flex; align-items:center; gap:12px; margin:16px var(--pad) 0; background:var(--glass); border:1px solid var(--glass-brd); border-radius:16px; padding:14px 15px; text-decoration:none; color:var(--ink); box-shadow:var(--shadow); backdrop-filter:blur(10px)}
+  .maplink .mi{width:42px; height:42px; border-radius:12px; background:rgba(45,90,39,.12); color:var(--green); display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .maplink .mi svg{width:21px;height:21px}
+  .maplink .mt{flex:1}
+  .maplink .mt b{font-size:14.5px; font-weight:600}
+  .maplink .mt span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
+  .maplink .ar{color:var(--muted)}
+
+  .section{padding:18px var(--pad) 2px}
+  .stitle{font-size:16px; font-weight:600; margin:8px 2px 12px; display:flex; align-items:center; gap:8px}
+  .stitle svg{width:18px;height:18px; color:var(--green)}
+  .card-glass{background:var(--glass); border:1px solid var(--glass-brd); border-radius:16px; backdrop-filter:blur(10px); box-shadow:var(--shadow)}
+
+  .xpcard{padding:15px 16px}
+  .xphead{display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--muted)}
+  .xphead b{color:var(--ink); font-size:15px; font-weight:600; display:flex; align-items:center; gap:6px}
+  .xphead b svg{width:16px;height:16px; color:var(--mustard-2)}
+  .bar{height:10px; background:var(--line); border-radius:6px; overflow:hidden; margin-top:10px}
+  .bar > i{display:block; height:100%; width:64%; background:var(--green); border-radius:6px}
+  .streakline{display:flex; align-items:center; gap:7px; margin-top:12px; font-size:13px}
+  .streakline svg{width:17px;height:17px; color:var(--mustard-2)}
+
+  .badges{display:flex; gap:12px; overflow-x:auto; padding-bottom:6px}
+  .badges::-webkit-scrollbar{display:none}
+  .badge{flex:0 0 auto; width:74px; text-align:center}
+  .badge .bc{width:60px; height:60px; margin:0 auto; border-radius:18px; display:flex; align-items:center; justify-content:center; background:rgba(45,90,39,.1); color:var(--green); border:1px solid var(--line)}
+  .badge .bc svg{width:26px;height:26px}
+  .badge.locked .bc{background:var(--line); color:var(--muted); opacity:.6}
+  .badge small{display:block; font-size:11px; color:var(--muted); margin-top:6px; line-height:1.25}
+
+  .prog{padding:4px 14px}
+  .prow{display:flex; align-items:center; gap:12px; padding:12px 0}
+  .prow + .prow{border-top:1px solid var(--line)}
+  .pdot{width:12px; height:12px; border-radius:50%; flex:0 0 auto}
+  .pmeta{flex:1}
+  .pmeta .pn{font-size:14px; font-weight:600; display:flex; justify-content:space-between}
+  .pmeta .pn span{font-size:12px; color:var(--muted); font-weight:500}
+  .mini{height:7px; background:var(--line); border-radius:5px; overflow:hidden; margin-top:7px}
+  .mini > i{display:block; height:100%; border-radius:5px}
+
+  .addpl{width:100%; margin-top:11px; display:flex; align-items:center; justify-content:center; gap:7px; background:transparent; border:1.5px dashed var(--green); color:var(--green); border-radius:14px; padding:12px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit}
+  .addpl svg{width:16px;height:16px}
+  .plcard{display:flex; align-items:center; gap:12px; background:var(--glass); border:1px solid var(--glass-brd); border-radius:15px; padding:11px; margin-bottom:9px; cursor:pointer; backdrop-filter:blur(10px)}
+  .plcov{width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; flex:0 0 auto}
+  .plcov svg{width:20px;height:20px}
+  .pl-spotify{background:#1DB954} .pl-youtube{background:#C0392B} .pl-apple{background:#B33B4A}
+  .plinfo{flex:1; min-width:0}
+  .plinfo b{font-size:14.5px; font-weight:600; display:block}
+  .plinfo small{font-size:12px; color:var(--muted)}
+  .plplay{width:34px; height:34px; border-radius:50%; background:rgba(45,90,39,.12); color:var(--green); display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .plplay svg{width:16px;height:16px}
+
+  .gtabs{display:flex; gap:9px; padding:20px var(--pad) 10px}
+  .gt{flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; border-radius:12px; font-size:13.5px; font-weight:500; color:var(--muted); background:var(--glass); border:1px solid var(--line); cursor:pointer}
+  .gt svg{width:16px;height:16px}
+  .gt.on{background:var(--green); color:#F3F0E9; border-color:var(--green)}
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:0 10px}
+  .cell{position:relative; aspect-ratio:9/13; background:#0c1413; border-radius:9px; overflow:hidden; cursor:pointer}
+  .cell video{width:100%; height:100%; object-fit:cover}
+  .cell .ov{position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.6),transparent 50%); display:flex; flex-direction:column; justify-content:flex-end; padding:7px}
+  .cell .ttl{color:#fff; font-size:10.5px; font-weight:500; line-height:1.2}
+  .cell .lk{color:#fff; font-size:10px; display:flex; align-items:center; gap:3px; margin-top:2px; opacity:.9}
+  .cell .lk svg{width:11px;height:11px}
+  .cell .lv{position:absolute; top:6px; right:6px; font-size:9px; font-weight:600; padding:2px 7px; border-radius:7px}
+  .lvc-קל{background:var(--green); color:#F3F0E9} .lvc-בינוני{background:var(--mustard); color:#3a2a00} .lvc-קשה{background:var(--coral); color:#fff}
+  .empty{text-align:center; color:var(--muted); font-size:13px; padding:34px 20px; line-height:1.6}
+
+  .nav{position:absolute; bottom:0; left:0; right:0; height:70px; background:var(--bg); border-top:1px solid var(--line); display:flex; justify-content:space-around; align-items:center; padding-bottom:6px; z-index:20}
+  .nav a{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--muted); text-decoration:none; font-weight:500}
+  .nav a svg{width:23px;height:23px}
+  .nav a.on{color:var(--green)}
+  .fab{width:54px; height:54px; border-radius:50%; background:#2D5A27; color:#F3F0E9; display:flex; align-items:center; justify-content:center; margin-top:-22px; box-shadow:0 6px 18px rgba(0,0,0,.28); text-decoration:none; border:none; cursor:pointer}
+  .fab svg{width:27px;height:27px; color:#fff; stroke-width:2.75}
+
+  .grab{width:44px; height:5px; background:var(--line); border-radius:3px; margin:12px auto 4px}
+  .plov{position:absolute; inset:0; background:rgba(44,62,80,.4); opacity:0; pointer-events:none; transition:.25s; z-index:45; backdrop-filter:blur(2px)}
+  .plov.show{opacity:1; pointer-events:auto}
+  .plsheet{position:absolute; left:0; right:0; bottom:0; background:var(--sheet-bg); border-radius:22px 22px 0 0; transform:translateY(102%); transition:.3s cubic-bezier(.3,.8,.3,1); z-index:46; max-height:88%; overflow-y:auto}
+  .plsheet.show{transform:translateY(0)}
+  .plh{text-align:center; font-size:17px; font-weight:600; padding:6px 0 2px}
+  .plbody{padding:8px var(--pad) 24px}
+  .fl2{font-size:12.5px; font-weight:600; color:var(--muted); margin:14px 2px 7px}
+  .platrow{display:flex; gap:8px}
+  .platrow .plat{flex:1; text-align:center; padding:11px; border-radius:12px; border:1.5px solid var(--line); background:var(--glass); font-weight:500; font-size:13.5px; cursor:pointer; color:var(--ink)}
+  .platrow .plat.on{border-color:var(--green); background:rgba(45,90,39,.1); color:var(--green)}
+  .plbody input{width:100%; border:1px solid var(--line); border-radius:12px; padding:12px; font-size:14px; font-family:inherit; outline:none; background:var(--glass-2); color:var(--ink)}
+  .plsub{width:100%; margin-top:18px; background:var(--green); color:#F3F0E9; border:none; border-radius:14px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit}
+
+  .vov{position:absolute; inset:0; background:rgba(10,12,14,.95); z-index:40; display:none; align-items:center; justify-content:center}
+  .vov.show{display:flex}
+  .vov video{width:100%; height:100%; object-fit:contain}
+  .vov .x{position:absolute; top:40px; left:18px; color:#fff; cursor:pointer; z-index:2}
+  .vov .x svg{width:26px;height:26px}
+  .toast{position:absolute; bottom:82px; left:50%; transform:translateX(-50%) translateY(10px); z-index:50; background:#2C3E50; color:#F3F0E9; padding:11px 18px; border-radius:14px; font-size:13.5px; font-weight:500; opacity:0; transition:.3s}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="body">
+    <div class="head">
+      <div class="htop">
+        <span class="brand"><img src="logo.png" alt="">GINGA</span>
+        <div class="acts">
+          <button id="themeBtn" onclick="toggleTheme()" aria-label="החלף מצב תצוגה"><i data-lucide="moon" id="themeIc"></i></button>
+          <a href="altinha-settings.html" title="הגדרות" aria-label="הגדרות"><i data-lucide="settings"></i></a>
+        </div>
+      </div>
+      <div class="pwrap">
+        <div class="pic">נ</div>
+        <div class="pinfo">
+          <div class="pname">נועה לוי</div>
+          <div class="phandle">@noa.ginga</div>
+          <div class="ploc"><i data-lucide="map-pin"></i> חוף הצוק, נתניה</div>
+        </div>
+      </div>
+      <div class="badgeline"><span class="plevel"><i data-lucide="medal"></i> רמה 3 · מתחילה+</span></div>
+      <div class="bio">לומדת אלטיניה צעד-אחר-צעד · כל יום עוד טריק</div>
+      <div class="statsrow">
+        <div class="stat" onclick="toast('הקליפים שלך')"><b>6</b><span>קליפים</span></div>
+        <div class="stat" onclick="toast('עוקבים')"><b>248</b><span>עוקבים</span></div>
+        <div class="stat" onclick="toast('נעקבים')"><b>173</b><span>עוקבת</span></div>
+        <div class="stat" onclick="toast('לייקים')"><b>1.9K</b><span>קודוס</span></div>
+      </div>
+      <div class="btnrow">
+        <button class="b fill" onclick="toast('עריכת פרופיל')"><i data-lucide="edit-3"></i> ערוך פרופיל</button>
+        <button class="b out" onclick="toast('שיתוף פרופיל')"><i data-lucide="share-2"></i> שתף</button>
+      </div>
+    </div>
+
+    <a class="maplink" href="altinha-map.html">
+      <div class="mi"><i data-lucide="map"></i></div>
+      <div class="mt"><b>מקומות משחק בקרבתך</b><span>8 חופים פעילים · 248 שחקנים באזורך</span></div>
+      <div class="ar"><i data-lucide="chevron-left"></i></div>
+    </a>
+
+    <div class="section">
+      <div class="xpcard card-glass">
+        <div class="xphead"><b><i data-lucide="zap"></i> 320 XP</b><span>עוד 180 XP לרמה 4</span></div>
+        <div class="bar"><i></i></div>
+        <div class="streakline"><i data-lucide="flame"></i> רצף של <b>&nbsp;5 ימים&nbsp;</b> — אל תפספס היום</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stitle"><i data-lucide="trophy"></i> ההישגים שלי</div>
+      <div class="badges">
+        <div class="badge"><div class="bc"><i data-lucide="target"></i></div><small>טריק ראשון</small></div>
+        <div class="badge"><div class="bc"><i data-lucide="flame"></i></div><small>רצף 5 ימים</small></div>
+        <div class="badge"><div class="bc"><i data-lucide="clapperboard"></i></div><small>שיתוף ראשון</small></div>
+        <div class="badge"><div class="bc"><i data-lucide="circle-dot"></i></div><small>5 טריקים</small></div>
+        <div class="badge locked"><div class="bc"><i data-lucide="award"></i></div><small>רמה בינוני</small></div>
+        <div class="badge locked"><div class="bc"><i data-lucide="crown"></i></div><small>100 קודוס</small></div>
+        <div class="badge locked"><div class="bc"><i data-lucide="star"></i></div><small>אתגר שבועי</small></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stitle"><i data-lucide="trending-up"></i> התקדמות בטריקים</div>
+      <div class="prog card-glass">
+        <div class="prow"><div class="pdot" style="background:var(--green)"></div>
+          <div class="pmeta"><div class="pn">קל <span>2 / 2 הושלמו</span></div><div class="mini"><i style="width:100%;background:var(--green)"></i></div></div></div>
+        <div class="prow"><div class="pdot" style="background:var(--mustard)"></div>
+          <div class="pmeta"><div class="pn">בינוני <span>1 / 3 הושלמו</span></div><div class="mini"><i style="width:33%;background:var(--mustard)"></i></div></div></div>
+        <div class="prow"><div class="pdot" style="background:var(--coral)"></div>
+          <div class="pmeta"><div class="pn">קשה <span>0 / 1 הושלמו</span></div><div class="mini"><i style="width:4%;background:var(--coral)"></i></div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stitle"><i data-lucide="music"></i> הפלייליסט למשחק</div>
+      <div id="playlists"></div>
+      <button class="addpl" onclick="openPl()"><i data-lucide="plus"></i> הוסף פלייליסט</button>
+    </div>
+
+    <a class="maplink" href="altinha-admin.html">
+      <div class="mi"><i data-lucide="shield"></i></div>
+      <div class="mt"><b>אזור ניהול</b><span>ניהול והוספה של תרגילים ומיקומים</span></div>
+      <div class="ar"><i data-lucide="chevron-left"></i></div>
+    </a>
+    <div style="height:16px"></div>
+  </div>
+
+  <div class="nav">
+    <a href="altinha-training.html"><i data-lucide="book-open"></i>תרגול</a>
+    <a href="altinha-feed.html"><i data-lucide="activity"></i>פעילות</a>
+    <a class="fab" href="altinha-feed.html"><i data-lucide="plus"></i></a>
+    <a href="altinha-map.html"><i data-lucide="map-pin"></i>מפה</a>
+    <a class="on"><i data-lucide="user"></i>פרופיל</a>
+  </div>
+
+  <div class="plov" id="plOv" onclick="closePl()"></div>
+  <div class="plsheet" id="plSheet">
+    <div class="grab"></div>
+    <div class="plh">הוספת פלייליסט</div>
+    <div class="plbody">
+      <div class="fl2">פלטפורמה</div>
+      <div class="platrow" id="platrow">
+        <div class="plat on" data-p="spotify" onclick="pickPlat(this)">Spotify</div>
+        <div class="plat" data-p="youtube" onclick="pickPlat(this)">YouTube</div>
+        <div class="plat" data-p="apple" onclick="pickPlat(this)">Apple</div>
+      </div>
+      <div class="fl2">שם הפלייליסט</div>
+      <input id="plName" type="text" placeholder="למשל: Beach Vibes">
+      <div class="fl2">קישור לפלייליסט</div>
+      <input id="plUrl" type="text" placeholder="הדבק קישור מ-Spotify / YouTube / Apple">
+      <button class="plsub" onclick="addPl()">שתף בפרופיל</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+const PLAT = { spotify:{label:'Spotify', ic:'headphones'}, youtube:{label:'YouTube Music', ic:'play'}, apple:{label:'Apple Music', ic:'music'} };
+let PLAYLISTS = [
+  {name:"Beach Vibes", platform:"spotify", tracks:42, url:"https://open.spotify.com/"},
+  {name:"Ginga Funk", platform:"youtube", tracks:28, url:"https://music.youtube.com/"},
+];
+function renderPl(){
+  const w=$("#playlists"); w.innerHTML="";
+  PLAYLISTS.forEach(p=>{
+    const el=document.createElement('div'); el.className='plcard';
+    el.innerHTML=`<div class="plcov pl-${p.platform}"><i data-lucide="${PLAT[p.platform].ic}"></i></div>
+      <div class="plinfo"><b>${p.name}</b><small>${PLAT[p.platform].label} · ${p.tracks} שירים</small></div>
+      <div class="plplay"><i data-lucide="play"></i></div>`;
+    el.onclick=()=> p.url ? window.open(p.url,'_blank') : toast('פותח את הפלייליסט');
+    w.appendChild(el);
+  });
+  icons();
+}
+renderPl();
+let plPlatform='spotify';
+function pickPlat(el){ document.querySelectorAll('.platrow .plat').forEach(x=>x.classList.remove('on')); el.classList.add('on'); plPlatform=el.dataset.p; }
+function openPl(){ $("#plOv").classList.add('show'); $("#plSheet").classList.add('show'); }
+function closePl(){ $("#plOv").classList.remove('show'); $("#plSheet").classList.remove('show'); }
+function addPl(){
+  const name=$("#plName").value.trim()||'הפלייליסט שלי', url=$("#plUrl").value.trim();
+  PLAYLISTS.push({name, platform:plPlatform, tracks:'—', url});
+  $("#plName").value=""; $("#plUrl").value=""; closePl(); renderPl();
+  toast('הפלייליסט נוסף לפרופיל שלך');
+}
+function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); try{localStorage.setItem('ginga-theme',t)}catch(e){}
+  const ic=document.getElementById('themeIc'); if(ic){ ic.setAttribute('data-lucide', t==='dark'?'sun':'moon'); } icons(); }
+function toggleTheme(){ const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'brazil'; applyTheme(cur==='dark'?'brazil':'dark'); }
+(function(){ let t='brazil'; try{ t=localStorage.getItem('ginga-theme')||'brazil'; }catch(e){} applyTheme(t); })();
+let tT; function toast(m){ const t=$("#toast"); t.textContent=m; t.clas

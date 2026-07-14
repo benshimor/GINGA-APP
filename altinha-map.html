@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GINGA — קהילה</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FDFBF7; --bg-outer:#EDE7DB; --green:#2D5A27; --green-2:#3B7233; --mustard:#E6A800; --mustard-2:#C98F00;
+    --ink:#2C3E50; --muted:#6B7789; --line:rgba(44,62,80,.10);
+    --glass:rgba(255,255,255,.6); --glass-2:rgba(255,255,255,.8); --glass-brd:rgba(255,255,255,.7);
+    --pad:16px; --radius:16px; --shadow:0 8px 26px rgba(44,62,80,.10);
+    --header-bg:linear-gradient(160deg, var(--green) 0%, #24471F 100%); --notch:var(--green); --sheet-bg:#FBF8F2; --nav-bg:#FBF8F2;
+  }
+  html[data-theme="dark"]{
+    --bg:#0B0C0E; --bg-outer:#060607; --green:#5FA855; --green-2:#6FB865; --mustard:#E9B02A; --mustard-2:#F0BC3E;
+    --ink:#EAECEF; --muted:#8B93A0; --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.05); --glass-2:rgba(255,255,255,.08); --glass-brd:rgba(255,255,255,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.5); --header-bg:#111318; --notch:#0A0B0D; --sheet-bg:#131519; --nav-bg:#0A0B0D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg-outer);
+    display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:24px 12px}
+  h1,h2,h3{font-weight:600}
+  svg.lucide{width:1.25em; height:1.25em; stroke-width:2; vertical-align:middle}
+  .phone{width:390px; max-width:100%; background:var(--bg); border-radius:38px; overflow:hidden;
+    box-shadow:0 30px 70px rgba(44,62,80,.22); position:relative; height:840px; display:flex; flex-direction:column}
+  .notch{height:26px; background:var(--notch); position:relative; z-index:1200}
+  .notch::after{content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:120px; height:18px; background:var(--notch); border-radius:0 0 14px 14px}
+
+  .head{background:var(--header-bg); color:#F3F0E9; padding:14px var(--pad) 14px; z-index:1000}
+  .headrow{display:flex; align-items:center; gap:9px}
+  .headrow img{width:28px; height:28px}
+  .head h1{font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px}
+  .themebtn{margin-inline-start:auto; width:36px; height:36px; border-radius:11px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); color:#F3F0E9; display:flex; align-items:center; justify-content:center; cursor:pointer}
+  .themebtn svg{width:18px;height:18px}
+  .seg{display:flex; background:rgba(255,255,255,.14); border-radius:13px; padding:4px; margin-top:12px}
+  .seg div{flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px; border-radius:10px; font-size:13.5px; font-weight:500; cursor:pointer; color:#F3F0E9; opacity:.8}
+  .seg div svg{width:16px;height:16px}
+  .seg div.on{background:#fff; color:var(--green); opacity:1}
+  html[data-theme="dark"] .seg div.on{background:#2A2E36; color:#F3F0E9}
+  .chips{display:flex; gap:7px; margin-top:11px; overflow-x:auto}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto; background:rgba(255,255,255,.16); color:#F3F0E9; border:1px solid rgba(255,255,255,.22); padding:6px 13px; border-radius:16px; font-size:12.5px; font-weight:500; cursor:pointer; white-space:nowrap}
+  .chip.on{background:#fff; color:var(--green); border-color:#fff}
+  html[data-theme="dark"] .chip.on{background:#2A2E36; color:#F3F0E9}
+
+  .maparea{flex:1; position:relative}
+  #map{position:absolute; inset:0; z-index:1}
+  .leaflet-container{font-family:'Inter',sans-serif; background:#dfe6dd}
+  html[data-theme="dark"] .leaflet-container{background:#0E1013}
+  html[data-theme="dark"] .leaflet-tile{filter:brightness(.7) saturate(.8) contrast(1.05) invert(0)}
+  .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--sheet-bg); color:var(--ink); box-shadow:0 10px 30px rgba(0,0,0,.25); border:1px solid var(--line)}
+  .leaflet-popup-content-wrapper{border-radius:14px}
+  .pin{width:30px; height:30px; border-radius:50% 50% 50% 4px; transform:rotate(45deg); border:2.5px solid #fff; box-shadow:0 3px 8px rgba(0,0,0,.3)}
+  .pin.hot,.pin.now{background:var(--green)} .pin.mid,.pin.planned{background:var(--mustard)} .pin.calm{background:var(--green-2)}
+  .pin.now{animation:pp 1.6s infinite}
+  @keyframes pp{0%,100%{box-shadow:0 3px 8px rgba(0,0,0,.3)}50%{box-shadow:0 3px 8px rgba(0,0,0,.3),0 0 0 7px rgba(45,90,39,.3)}}
+
+  .pop b{font-size:14.5px; color:var(--ink); font-weight:600}
+  .pop .area{font-size:12px; color:var(--muted); margin:3px 0 7px}
+  .pop .meta{font-size:12.5px; color:var(--ink); line-height:1.7}
+  .pop .live{display:inline-flex; align-items:center; gap:5px; background:rgba(45,90,39,.14); color:var(--green); font-weight:600; font-size:11.5px; padding:3px 9px; border-radius:10px; margin-top:7px}
+  .pop .live .dot{width:7px; height:7px; border-radius:50%; background:var(--green)}
+  .pop button{margin-top:9px; width:100%; background:var(--green); color:#F3F0E9; border:none; border-radius:10px; padding:9px; font-weight:600; font-size:12.5px; cursor:pointer; font-family:inherit}
+
+  .sheet{position:absolute; left:0; right:0; bottom:70px; z-index:1000; background:var(--sheet-bg); border-radius:20px 20px 0 0; box-shadow:0 -8px 26px rgba(44,62,80,.14); max-height:52%; display:flex; flex-direction:column; transition:transform .3s; border:1px solid var(--line); border-bottom:none}
+  .sheet.min{transform:translateY(calc(100% - 54px))}
+  .grab{width:44px; height:5px; background:var(--line); border-radius:3px; margin:10px auto 4px; cursor:pointer}
+  .sheethead{display:flex; align-items:center; justify-content:space-between; padding:0 var(--pad) 10px; border-bottom:1px solid var(--line); cursor:pointer}
+  .sheethead b{font-size:14px; color:var(--ink); font-weight:600}
+  .openbtn{display:flex; align-items:center; gap:5px; background:var(--green); color:#F3F0E9; border:none; border-radius:11px; padding:8px 13px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit}
+  .openbtn svg{width:15px;height:15px}
+  .list{overflow-y:auto; padding:8px 12px 14px}
+
+  .item{display:flex; gap:12px; align-items:center; padding:11px 4px; cursor:pointer}
+  .item + .item{border-top:1px solid var(--line)}
+  .ipin{width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .ipin svg{width:19px;height:19px}
+  .ip-hot{background:rgba(45,90,39,.12); color:var(--green)} .ip-mid{background:rgba(230,168,0,.14); color:var(--mustard-2)} .ip-calm{background:rgba(59,114,51,.12); color:var(--green-2)}
+  .iinfo{flex:1; min-width:0}
+  .iinfo .nm{font-size:14px; font-weight:600; color:var(--ink)}
+  .iinfo .sub{font-size:12px; color:var(--muted); margin-top:2px}
+  .ibadge{font-size:11px; font-weight:600; color:var(--green); background:rgba(45,90,39,.12); padding:3px 9px; border-radius:10px; white-space:nowrap}
+
+  .circle{background:var(--glass); border:1px solid var(--glass-brd); border-radius:16px; padding:13px; margin-bottom:11px; cursor:pointer; backdrop-filter:blur(10px); box-shadow:var(--shadow)}
+  .ctop{display:flex; align-items:center; gap:10px}
+  .cav{width:38px; height:38px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:#F3F0E9; font-weight:600; font-size:15px}
+  .cmain{flex:1; min-width:0}
+  .cmain .cn{font-size:14px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+  .cmain .cw{font-size:12px; color:var(--muted); margin-top:2px}
+  .modeb{font-size:11px; font-weight:600; padding:3px 10px; border-radius:10px; white-space:nowrap}
+  .mb-now{background:rgba(45,90,39,.14); color:var(--green)} .mb-planned{background:rgba(230,168,0,.16); color:var(--mustard-2)}
+  .cnote{font-size:12.5px; color:var(--ink); margin:10px 0 0; line-height:1.5; opacity:.85}
+  .cbottom{display:flex; align-items:center; justify-content:space-between; margin-top:12px}
+  .seats{display:flex; align-items:center; gap:8px}
+  .av-row{display:flex}
+  .av-row i{width:26px; height:26px; border-radius:50%; border:2px solid var(--bg); margin-inline-start:-8px; display:block; font-style:normal}
+  .av-row i.me{background:var(--green); color:#F3F0E9; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600}
+  .av-row i.need{background:var(--line); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px}
+  .seats .txt{font-size:12px; color:var(--muted); font-weight:500}
+  .joinb{background:var(--green); color:#F3F0E9; border:none; border-radius:11px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit}
+  .joinb.full{background:var(--line); color:var(--muted)}
+  .joinb.going{background:rgba(45,90,39,.14); color:var(--green)}
+  .joinb.cancel{background:rgba(192,60,45,.12); color:#C0392B}
+  .mineTag{font-size:10.5px; font-weight:600; color:var(--mustard-2); background:rgba(230,168,0,.16); padding:2px 8px; border-radius:8px}
+  .lvtag{font-size:10.5px; font-weight:600; color:var(--green); background:rgba(45,90,39,.1); padding:2px 8px; border-radius:8px}
+
+  .overlay{position:absolute; inset:0; background:rgba(44,62,80,.4); opacity:0; pointer-events:none; transition:.25s; z-index:1300; backdrop-filter:blur(2px)}
+  .overlay.show{opacity:1; pointer-events:auto}
+  .form{position:absolute; left:0; right:0; bottom:0; z-index:1301; background:var(--sheet-bg); border-radius:22px 22px 0 0; transform:translateY(102%); transition:.3s cubic-bezier(.3,.8,.3,1); max-height:88%; overflow-y:auto}
+  .form.show{transform:translateY(0)}
+  .form .fh{text-align:center; font-size:17px; font-weight:600; color:var(--ink); padding:8px 0 4px}
+  .fbody{padding:6px var(--pad) 22px}
+  .fl{font-size:12.5px; font-weight:600; color:var(--muted); margin:15px 2px 7px}
+  .toggle2{display:flex; gap:8px}
+  .toggle2 div{flex:1; text-align:center; padding:12px; border-radius:13px; border:1.5px solid var(--line); background:var(--glass); font-size:13.5px; font-weight:500; color:var(--ink); cursor:pointer}
+  .toggle2 div.on{border-color:var(--green); background:rgba(45,90,39,.1); color:var(--green)}
+  select, input[type=text]{width:100%; border:1px solid var(--line); border-radius:12px; padding:12px; font-size:14px; font-family:inherit; background:var(--glass-2); color:var(--ink); outline:none}
+  .needrow{display:flex; align-items:center; gap:12px}
+  .needrow button{width:40px; height:40px; border-radius:11px; border:1px solid var(--line); background:var(--glass-2); font-size:20px; font-weight:600; color:var(--green); cursor:pointer}
+  .needrow span{font-size:18px; font-weight:600; min-width:30px; text-align:center}
+  .submit{width:100%; margin-top:20px; background:var(--green); color:#F3F0E9; border:none; border-radius:14px; padding:15px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit}
+
+  .nav{position:absolute; bottom:0; left:0; right:0; height:70px; background:var(--nav-bg); border-top:1px solid var(--line); display:flex; justify-content:space-around; align-items:center; padding-bottom:6px; z-index:1100; box-shadow:0 -4px 18px rgba(44,62,80,.08)}
+  .nav a{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--muted); text-decoration:none; font-weight:500; cursor:pointer}
+  .nav a svg{width:23px;height:23px}
+  .nav a.on{color:var(--green)}
+  .fab{width:54px; height:54px; border-radius:50%; background:#2D5A27; color:#F3F0E9; display:flex; align-items:center; justify-content:center; margin-top:-22px; box-shadow:0 6px 18px rgba(0,0,0,.28); text-decoration:none; border:none; cursor:pointer}
+  .fab svg{width:27px;height:27px; color:#fff; stroke-width:2.75}
+
+  .rsvp{position:absolute; left:18px; right:18px; top:50%; transform:translateY(-50%) scale(.92); z-index:1401; background:var(--sheet-bg); border:1px solid var(--line); border-radius:22px; padding:22px 18px; opacity:0; pointer-events:none; transition:.25s; box-shadow:0 16px 50px rgba(44,62,80,.3)}
+  .rsvp.show{opacity:1; pointer-events:auto; transform:translateY(-50%) scale(1)}
+  .rsvp .rh{text-align:center; font-size:18px; font-weight:600; color:var(--ink)}
+  .rsvp .rsub{text-align:center; font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.4}
+  .rbtns{display:flex; gap:10px; margin-top:18px}
+  .rbtns button{flex:1; padding:14px; border-radius:13px; border:none; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit}
+  .ryes{background:var(--green); color:#F3F0E9}
+  .rno{background:var(--glass); color:var(--muted); border:1px solid var(--line)}
+  .rcl{text-align:center; font-size:13px; font-weight:600; color:var(--muted); margin-top:16px}
+  .rhint{text-align:center; font-size:12.5px; color:var(--green); font-weight:500; margin-top:8px}
+  .rcancel{width:100%; margin-top:10px; background:none; border:none; color:#C0392B; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit}
+
+  .toast{position:absolute; bottom:130px; left:50%; transform:translateX(-50%) translateY(10px); z-index:1500; background:#2C3E50; color:#F3F0E9; padding:12px 18px; border-radius:14px; font-size:13.5px; font-weight:500; opacity:0; transition:.3s; max-width:84%; text-align:center; line-height:1.4}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="head">
+    <div class="headrow">
+      <img src="logo.png" alt="">
+      <h1>קהילה</h1>
+      <button class="themebtn" id="themeBtn" onclick="toggleTheme()" aria-label="החלף מצב תצוגה"><i data-lucide="moon" id="themeIc"></i></button>
+    </div>
+    <div class="seg">
+      <div data-v="places" onclick="setView('places')"><i data-lucide="map-pin"></i> מקומות</div>
+      <div class="on" data-v="circles" onclick="setView('circles')"><i data-lucide="users"></i> מעגלים</div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="maparea">
+    <div id="map"></div>
+    <div class="sheet" id="sheet">
+      <div class="grab" onclick="toggleSheet()"></div>
+      <div class="sheethead">
+        <b id="sheetTitle">מעגלים פתוחים</b>
+        <button class="openbtn" id="openBtn" onclick="openForm()"><i data-lucide="plus"></i> פתח מעגל</button>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="altinha-training.html"><i data-lucide="book-open"></i>תרגול</a>
+    <a href="altinha-feed.html"><i data-lucide="activity"></i>פעילות</a>
+    <a class="fab" href="altinha-feed.html"><i data-lucide="plus"></i></a>
+    <a class="on"><i data-lucide="map-pin"></i>מפה</a>
+    <a href="altinha-profile.html"><i data-lucide="user"></i>פרופיל</a>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeForm()"></div>
+  <div class="form" id="form">
+    <div class="grab"></div>
+    <div class="fh">פתיחת מעגל</div>
+    <div class="fbody">
+      <div class="fl">מתי?</div>
+      <div class="toggle2" id="modeT">
+        <div class="on" data-m="now" onclick="pickMode('now')">עכשיו</div>
+        <div data-m="planned" onclick="pickMode('planned')">מתוכנן</div>
+      </div>
+      <div id="timeWrap" style="display:none">
+        <div class="fl">יום ושעה</div>
+        <select id="fTime"><option>היום 18:00</option><option>היום 20:00</option><option>מחר 09:00</option><option>מחר 18:00</option><option>יום ה' 18:00</option><option>שבת 09:00</option></select>
+      </div>
+      <div class="fl">איפה?</div>
+      <select id="fSpot"></select>
+      <div class="fl">רמה</div>
+      <select id="fLevel"><option>כל הרמות</option><option>מתחילים</option><option>קל-בינוני</option><option>בינוני+</option><option>מתקדם</option></select>
+      <div class="fl">כמה שחקנים דרושים? (כולל אותך)</div>
+      <div class="needrow">
+        <button onclick="needAdj(-1)">−</button><span id="needN">4</span><button onclick="needAdj(1)">＋</button>
+        <span style="font-size:12.5px;color:var(--muted);font-weight:500;margin-inline-start:6px">מעגל קלאסי = 4</span>
+      </div>
+      <div class="fl">הערה (אופציונלי)</div>
+      <input type="text" id="fNote" placeholder="למשל: אווירה כיפית, בואו לסגור מעגל">
+      <button class="submit" onclick="publish()">פרסם מעגל</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="rsvpOv" onclick="closeRsvp()"></div>
+  <div class="rsvp" id="rsvp">
+    <div class="rh">מגיע/ה למעגל?</div>
+    <div class="rsub" id="rsvpSub">—</div>
+    <div class="rbtns" id="rYesNo">
+      <button class="rno" onclick="rsvpNo()">לא מגיע</button>
+      <button class="ryes" onclick="rsvpYesStep()">מגיע</button>
+    </div>
+    <div id="rCount" style="display:none">
+      <div class="rcl">כמה אתם מגיעים?</div>
+      <div class="needrow" style="justify-content:center">
+        <button onclick="rAdj(-1)">−</button><span id="rN">1</span><button onclick="rAdj(1)">＋</button>
+      </div>
+      <div class="rhint" id="rHint">1 = רק אני</div>
+      <button class="submit" onclick="rsvpConfirm()">אישור הגעה</button>
+      <button class="rcancel" id="rCancel" style="display:none" onclick="rsvpNo()">ביטול הגעה</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="confOv" onclick="closeConf()"></div>
+  <div class="rsvp" id="conf">
+    <div class="rh">לבטל את המעגל?</div>
+    <div class="rsub" id="confSub">—</div>
+    <div class="rbtns">
+      <button class="rno" onclick="closeConf()">חזרה</button>
+      <button class="ryes" style="background:#C0392B" onclick="confirmCancel()">בטל מעגל</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s=>document.querySelector(s);
+function icons(){ if(window.lucide) lucide.createIcons(); }
+const SPOTS = [
+  {n:"חוף גורדון", area:"תל אביב", reg:"ת״א", lat:32.0879, lng:34.7665, heat:"hot", players:14, when:"כל יום 17:00–20:00", live:true},
+  {n:"חוף הילטון", area:"תל אביב", reg:"ת״א", lat:32.0921, lng:34.7706, heat:"hot", players:9, when:"סופי שבוע מהבוקר", live:true},
+  {n:"חוף בוגרשוב", area:"תל אביב", reg:"ת״א", lat:32.0790, lng:34.7640, heat:"mid", players:5, when:"אחה״צ", live:false},
+  {n:"חוף אכדיה", area:"הרצליה", reg:"מרכז", lat:32.1635, lng:34.7960, heat:"mid", players:6, when:"שישי בבוקר", live:true},
+  {n:"חוף הקשתות", area:"ראשון לציון", reg:"מרכז", lat:31.9650, lng:34.7300, heat:"calm", players:3, when:"שבת אחה״צ", live:false},
+  {n:"חוף סירונית", area:"נתניה", reg:"מרכז", lat:32.3360, lng:34.8520, heat:"mid", players:7, when:"כל יום בערב", live:true},
+  {n:"חוף דדו", area:"חיפה", reg:"צפון", lat:32.8100, lng:34.9560, heat:"mid", players:5, when:"סופי שבוע", live:false},
+  {n:"חוף לידו", area:"אשדוד", reg:"דרום", lat:31.8050, lng:34.6380, heat:"calm", players:4, when:"שישי–שבת", live:false},
+];
+const spotByName = n => SPOTS.find(s=>s.n===n);
+let CIRCLES = [
+  {host:"דניאל", color:"#C98F00", place:"חוף גורדון", mode:"now", time:"עד 19:30", level:"כל הרמות", total:4, joined:["#C98F00","#3B7233"], my:0, note:"מחפשים 2 לסגור מעגל, אווירה כיפית"},
+  {host:"מאיה", color:"#3B7233", place:"חוף סירונית", mode:"now", time:"עד 20:00", level:"בינוני+", total:4, joined:["#3B7233"], my:0, note:"רמה טובה, בואו"},
+  {host:"רון", color:"#2D5A27", place:"חוף הילטון", mode:"planned", time:"יום ה' 18:00", level:"קל-בינוני", total:6, joined:["#2D5A27","#3B7233","#C98F00"], my:0, note:"מעגל שבועי קבוע, כולם מוזמנים"},
+  {host:"שיר", color:"#C98F00", place:"חוף אכדיה", mode:"planned", time:"שבת 09:00", level:"מתחילים", total:4, joined:["#C98F00"], my:0, note:"מושלם למתחילים, בואו ללמוד יחד"},
+];
+const ME = "נועה";
+const filled = c => c.joined.length + c.my;
+const seatsLeft = c => c.total - filled(c);
+
+const map = L.map('map', {zoomControl:false}).setView([32.10, 34.82], 9);
+L.control.zoom({position:'topleft'}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
+function fixMap(){ map.invalidateSize(); }
+setTimeout(fixMap,250); setTimeout(fixMap,700); window.addEventListener('load',fixMap); window.addEventListener('resize',fixMap);
+const markers = [];
+function clearMarkers(){ markers.forEach(m=>map.removeLayer(m)); markers.length=0; }
+function pin(cls){ return L.divIcon({className:'', html:`<div class="pin ${cls}"></div>`, iconSize:[30,30], iconAnchor:[15,28], popupAnchor:[0,-28]}); }
+
+let view='circles', placeFilter='all', circleFilter='all';
+const CHIPS = {
+  places:[['all','הכל'],['now','משחקים עכשיו'],['ת״א','תל אביב'],['מרכז','מרכז'],['צפון','צפון'],['דרום','דרום']],
+  circles:[['all','הכל'],['now','עכשיו'],['planned','מתוכננים']],
+};
+function renderChips(){
+  const w=$("#chips"); w.innerHTML="";
+  const cur = view==='places'?placeFilter:circleFilter;
+  CHIPS[view].forEach(([f,label])=>{
+    const c=document.createElement('div'); c.className='chip'+(f===cur?' on':''); c.textContent=label; c.dataset.f=f;
+    c.onclick=()=>{ if(view==='places')placeFilter=f; else circleFilter=f; renderChips(); render(); };
+    w.appendChild(c);
+  });
+}
+function setView(v){
+  view=v;
+  document.querySelectorAll('.seg div').forEach(d=>d.classList.toggle('on',d.dataset.v===v));
+  $("#sheetTitle").textContent = v==='places' ? 'מקומות פעילים' : 'מעגלים פתוחים';
+  $("#openBtn").style.display = v==='circles' ? 'flex' : 'none';
+  renderChips(); render();
+}
+function render(){ view==='places' ? renderPlaces() : renderCircles(); }
+
+function renderPlaces(){
+  clearMarkers(); const list=$("#list"); list.innerHTML="";
+  const shown = SPOTS.filter(s=> placeFilter==="all"?true: placeFilter==="now"?s.live : s.reg===placeFilter);
+  shown.forEach(s=>{
+    const mk=L.marker([s.lat,s.lng],{icon:pin(s.heat)}).addTo(map)
+      .bindPopup(`<div class="pop"><b>${s.n}</b><div class="area">${s.area}</div>
+        <div class="meta">${s.when}<br>${s.players} שחקנים פעילים</div>
+        ${s.live?'<div class="live"><span class="dot"></span> משחקים עכשיו</div>':''}
+        <button onclick="toast('הצטרפת! נשלחה התראה לשחקנים בחוף ${s.n}')">אני בא לשחק</button></div>`);
+    markers.push(mk);
+    const it=document.createElement('div'); it.className='item';
+    it.innerHTML=`<div class="ipin ip-${s.heat}"><i data-lucide="map-pin"></i></div>
+      <div class="iinfo"><div class="nm">${s.n}</div><div class="sub">${s.area} · ${s.when}</div></div>
+      ${s.live?'<div class="ibadge">עכשיו</div>':`<div class="ibadge" style="background:var(--line);color:var(--muted)">${s.players} שחקנים</div>`}`;
+    it.onclick=()=>{ map.flyTo([s.lat,s.lng],14,{duration:.8}); markers.find(m=>m.getLatLng().lat===s.lat).openPopup(); };
+    list.appendChild(it);
+  });
+  icons();
+}
+function avatarsRow(c){
+  let h='<div class="av-row">';
+  c.joined.forEach(col=> h+=`<i style="background:${col}"></i>`);
+  for(let m=0;m<c.my;m++) h+=`<i class="me">${ME[0]}</i>`;
+  const need=seatsLeft(c);
+  for(let k=0;k<need;k++) h+='<i class="need">+</i>';
+  h+='</div>'; return h;
+}
+function renderCircles(){
+  clearMarkers(); const list=$("#list"); list.innerHTML="";
+  const shown = CIRCLES.filter(c=> circleFilter==="all"?true : c.mode===circleFilter);
+  if(!shown.length){ list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:26px">אין מעגלים פתוחים כרגע.<br>פתח מעגל ותן לשחקנים לידך לדעת.</div>'; }
+  shown.forEach((c)=>{
+    const i=CIRCLES.indexOf(c); const s=spotByName(c.place);
+    const need=seatsLeft(c); const full=need<=0; const coming=c.my>0; const isMine=c.host===ME;
+    let blabel, bclass;
+    if(coming){ blabel=`מגיע ×${c.my}`; bclass='going'; }
+    else if(full){ blabel='מלא'; bclass='full'; }
+    else { blabel='אני בא'; bclass=''; }
+    const mainBtn = isMine
+      ? `<button class="joinb cancel" onclick="cancelCircle(${i})">בטל מעגל</button>`
+      : `<button class="joinb ${bclass}" onclick="rsvpOpen(${i})">${blabel}</button>`;
+    if(s){ const mk=L.marker([s.lat,s.lng],{icon:pin(c.mode)}).addTo(map)
+        .bindPopup(`<div class="pop"><b>מעגל של ${c.host}${isMine?' (שלי)':''}</b><div class="area">${c.place} · ${c.time}</div>
+          <div class="meta">${coming?'אתה מגיע (×'+c.my+')':full?'המעגל מלא':'חסרים '+need+' שחקנים'} · רמה: ${c.level}</div>
+          <button onclick="${isMine?`cancelCircle(${i})`:`rsvpOpen(${i})`}">${isMine?'בטל מעגל':coming?'עדכון הגעה':full?'המעגל מלא':'אני בא'}</button></div>`);
+      markers.push(mk); }
+    const card=document.createElement('div'); card.className='circle';
+    card.innerHTML=`
+      <div class="ctop">
+        <div class="cav" style="background:${c.color}">${c.host[0]}</div>
+        <div class="cmain"><div class="cn">מעגל של ${c.host} ${isMine?'<span class="mineTag">שלי</span>':''}<span class="lvtag">${c.level}</span></div>
+          <div class="cw">${c.place} · ${c.time}</div></div>
+        <div class="modeb ${c.mode==='now'?'mb-now':'mb-planned'}">${c.mode==='now'?'עכשיו':'מתוכנן'}</div>
+      </div>
+      ${c.note?`<div class="cnote">${c.note}</div>`:''}
+      <div class="cbottom">
+        <div class="seats">${avatarsRow(c)}<span class="txt">${full?'מלא':'חסר '+need}</span></div>
+        ${mainBtn}
+      </div>`;
+    if(s) card.querySelector('.ctop').onclick=()=>{ map.flyTo([s.lat,s.lng],14,{duration:.8}); };
+    list.appendChild(card);
+  });
+  icons();
+}
+
+let rIdx=-1, rCount=1;
+function rsvpOpen(i){
+  rIdx=i; const c=CIRCLES[i];
+  const mm = c.total - c.joined.length;
+  if(mm<=0 && c.my<=0){ toast('המעגל כבר מלא'); return; }
+  rCount = c.my>0 ? c.my : 1;
+  $("#rsvpSub").textContent = `מעגל של ${c.host} · ${c.place} · ${c.time}`;
+  $("#rN").textContent = rCount; updateRhint();
+  $("#rYesNo").style.display = c.my>0 ? 'none' : 'flex';
+  $("#rCancel").style.display = c.my>0 ? 'block' : 'none';
+  $("#rCount").style.display = c.my>0 ? 'block' : 'none';
+  $("#rsvpOv").classList.add('show'); $("#rsvp").classList.add('show');
+}
+function closeRsvp(){ $("#rsvpOv").classList.remove('show'); $("#rsvp").classList.remove('show'); }
+function rsvpYesStep(){ $("#rYesNo").style.display='none'; $("#rCount").style.display='block'; }
+function maxMine(){ const c=CIRCLES[rIdx]; return c.total - c.joined.length; }
+function rAdj(d){ rCount=Math.max(1,Math.min(maxMine(),rCount+d)); $("#rN").textContent=rCount; updateRhint(); }
+function updateRhint(){ $("#rHint").textContent = rCount===1 ? '1 = רק אני' : `אני + ${rCount-1} חברים`; }
+function rsvpConfirm(){
+  const c=CIRCLES[rIdx]; c.my=rCount; closeRsvp();
+  const left=seatsLeft(c);
+  toast(left>0 ? `אישרת הגעה (×${c.my}) למעגל של ${c.host} · חסרים עוד ${left}` : `המעגל של ${c.host} מלא — נתראה ב${c.place}`);
+  render();
+}
+function rsvpNo(){ const c=CIRCLES[rIdx]; const was=c.my; c.my=0; closeRsvp(); toast(was>0 ? 'ביטלת את ההגעה שלך' : 'סימנת שאינך מגיע'); render(); }
+
+let confIdx=-1;
+function cancelCircle(i){
+  confIdx=i; const c=CIRCLES[i];
+  const others=c.joined.length + Math.max(0,c.my-1);
+  $("#confSub").textContent = others>0 ? `${others} שחקנים אישרו הגעה — תישלח להם התראה שהמעגל בוטל.` : 'עדיין לא הצטרפו שחקנים אחרים.';
+  $("#confOv").classList.add('show'); $("#conf").classList.add('show');
+}
+function closeConf(){ $("#confOv").classList.remove('show'); $("#conf").classList.remove('show'); }
+function confirmCancel(){ const c=CIRCLES[confIdx]; CIRCLES.splice(confIdx,1); closeConf(); toast(`המעגל ב${c.place} בוטל`); render(); }
+
+let fMode='now', fNeed=4;
+function fillSpots(){ const sel=$("#fSpot"); sel.innerHTML=""; SPOTS.forEach(s=>{ const o=document.createElement('option'); o.textContent=s.n; sel.appendChild(o); }); }
+fillSpots();
+function openForm(){ setView('circles'); $("#overlay").classList.add('show'); $("#form").classList.add('show'); }
+function closeForm(){ $("#overlay").classList.remove('show'); $("#form").classList.remove('show'); }
+function pickMode(m){ fMode=m; document.querySelectorAll('#modeT div').forEach(d=>d.classList.toggle('on',d.dataset.m===m)); $("#timeWrap").style.display = m==='planned'?'block':'none'; }
+function needAdj(d){ fNeed=Math.max(2,Math.min(8,fNeed+d)); $("#needN").textContent=fNeed; }
+function publish(){
+  const place=$("#fSpot").value, level=$("#fLevel").value, note=$("#fNote").value.trim();
+  const time = fMode==='now' ? 'עכשיו' : $("#fTime").value;
+  CIRCLES.unshift({host:"נועה", color:"#2D5A27", place, mode:fMode, time, level, to
